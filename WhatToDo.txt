@@ -1,3 +1,5 @@
+Note: This is only the compulsory part, look at pdf for more.
+
 Setup:
   Need Three entities -> player 1, player 2, destination
   Placed randomly on the cartesian plane (-800, 800)
@@ -25,17 +27,24 @@ Movement
       Idea: get the hypothenuse from the list that matches the distance, then 
     -> Also means left side will be b,a right will be a,b
 
-Use functions, no import except numpy, random and time
-reject negative Lengths and directions beyond 1, 8
-The players and destination will be dictionaries, called player_one, player_two, destination
-player dictionaries will contain -> current coordinates, distance from destination, midpoint coordinantes to other player, gradient of the line connecting player to destination and personal space buffer of 10 units
-in the destination dictionary should only contain current coordinatines and personal space buffer
-both distance and gradient are to 1 decimal place.
-then print current information
-optional termcolor
-player wins if their coordinates are within the destination personal space buffer or if they reach the other players personal space buffer
-if a number without a triple is selected, use closest lower triple number
-add comments and commits
-submit through a presentation 
+Dictionaries:
+  The players and destination will be dictionaries, called player_one, player_two, destination
+    -> Player dictionaries will contain -> current coordinates, distance from destination, midpoint coordinantes to other player, gradient of the line connecting player to destination and personal space buffer of 10 units
+    -> In the destination dictionary should only contain current coordinatines and personal space buffer
+    -> Both distance and gradient are to 1 decimal place. 
 
+Print:
+  print current information in dictionaries
+    -> optional termcolor
+Winning:
+  1. player wins if their coordinates are within the destination personal space buffer
+  2. if they reach the other players personal space buffer
 
+User Input:
+  if a number without a triple is selected use closest lower triple number
+  reject negative Lengths and directions beyond 1, 8
+
+More:
+  Add comments and commits
+  Submit through a presentation 
+  Use functions, no import except numpy, random and time
