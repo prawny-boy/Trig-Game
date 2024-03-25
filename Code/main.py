@@ -2,7 +2,7 @@
 import random, time
 
 # define dictionaries
-from triples_list import *
+from Code.triples_list import *
 player_one = {
   "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
   "distance": 0.0,
