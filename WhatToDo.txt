@@ -1,0 +1,41 @@
+Setup:
+  Need Three entities -> player 1, player 2, destination
+  Placed randomly on the cartesian plane (-800, 800)
+
+Movement
+  Player 1 and 2 will take turns moving to the fixed destination
+
+  Main Restriction: 
+    1. Players can only move on the hypothnuse of a right-angled triangle
+    2. Lengths of the sides of the triangle must form a primative pythagorean triple
+      -> a primative pythagorean triple is a triangle that all sides are coprime.
+      -> coprime means that the highest common divisor is 1. 
+        For example: (3, 4, 5)'s hcf is 1
+      -> We get a list of these triples (first 127)
+    3. the non-hypothenuse sides, a and b, have to be parallel to the x and y axis of the cartesian plane.
+
+  Figure out how to make a reusable means of achieving translations.
+    -> Can't use trigonometry
+    -> split into 1-8 directions, by splitting each quadrent into 2
+      Eg. 1 will be 0-45 degrees in cartesian
+        -> cartesian means 0 degrees is East and the positive direction is counter-clockwise.
+    -> a player can request to move x units in direction y
+      Eg. 5 <space> 3, where 5 is the distance and 3 is the direction.
+    -> Use the pythagorean triples
+      Idea: get the hypothenuse from the list that matches the distance, then 
+    -> Also means left side will be b,a right will be a,b
+
+Use functions, no import except numpy, random and time
+reject negative Lengths and directions beyond 1, 8
+The players and destination will be dictionaries, called player_one, player_two, destination
+player dictionaries will contain -> current coordinates, distance from destination, midpoint coordinantes to other player, gradient of the line connecting player to destination and personal space buffer of 10 units
+in the destination dictionary should only contain current coordinatines and personal space buffer
+both distance and gradient are to 1 decimal place.
+then print current information
+optional termcolor
+player wins if their coordinates are within the destination personal space buffer or if they reach the other players personal space buffer
+if a number without a triple is selected, use closest lower triple number
+add comments and commits
+submit through a presentation 
+
+
