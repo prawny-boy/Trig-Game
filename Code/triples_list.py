@@ -1,3 +1,4 @@
+# last number is hypothenuse
 triples = [
 [3, 4, 5],
 [5, 12, 13],
