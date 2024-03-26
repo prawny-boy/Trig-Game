@@ -90,6 +90,11 @@ def draw_plane(): # redraws the cartesian plane with player points on top.
   y_size = 1600 # size of the grid, -800 to 800
   # something here to print cartesian plane. Pygame?
 
+# testing functions
+update_dicts()
+print_stats(player_one)
+print_stats(player_two)
+
 # Main loop
 print("""INPUT RULES:
 1. All moves must be in the form of 'distance<space>direction'.
@@ -102,6 +107,7 @@ turn = 1
 while True:
   move = input().split(" ")
 
+  # Find triple
   isFound = False
   for num in range(100): # The 100 here is to ensure a triple is picked.
     for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
@@ -113,10 +119,8 @@ while True:
     if isFound == True: # only occurs if the triple is found
       break
   
+  # Use direction to move to a coordinate
+  if 
+
   print(a, b)
   turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
-
-# testing functions
-# update_dicts()
-# print_stats(player_one)
-# print_stats(player_two)
