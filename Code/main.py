@@ -179,5 +179,33 @@ RULES:
         break
     
     # Use direction to move to a coordinate.
-    
+    if direction % 2 == 0: # if the direction is even, flip a and b.
+      a, b = b, a # flips the variables so a=b and b=a
+    if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
+      a = abs(a)
+      b = abs(b)
+      update_coords(b, a, turn)
+    elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
+      a = -abs(a)
+      b = abs(b)
+      update_coords(a, b, turn)
+    elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
+      a = -abs(a)
+      b = -abs(b)
+      update_coords(b, a, turn)
+    elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
+      a = abs(a)
+      b = -abs(b)
+      update_coords(a, b, turn)
+
+    # Update dictionaries and stats
+    update_dicts()
+    if turn == 1: # prints the stats of the player.
+      print_stats(player_one)
+    elif turn == 2:
+      print_stats(player_two)
+    elif turn == 3: # for npc
+      pass
+
+    # Change the turn
     turn += 1 if turn != 2 else 1 # This changes the turns between 1 and 2.
