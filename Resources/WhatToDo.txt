@@ -48,3 +48,4 @@ More:
   Add comments and commits
   Submit through a presentation 
   Use functions, no import except numpy, random and time
+  NPC can be added for more marks
