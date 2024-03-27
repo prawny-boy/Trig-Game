@@ -44,10 +44,10 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
   pygame.draw.line(app_surf, 'grey',(app_surf_rect.width/2, 0),(app_surf_rect.width/2,app_surf_rect.height),width=1)
   # draw destination
-  pygame.draw.circle(app_surf, 'black', destination['pygame_coords'], radius = 3, width = 3)
+  pygame.draw.circle(app_surf, 'black', destination['current'], radius = 3, width = 3)
   # draw player one and player two
-  pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_coords'], radius = 3, width = 2)
-  pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_coords'], radius = 3, width = 2)
+  pygame.draw.circle(app_surf, player_one['colour'], player_one['current'], radius = 3, width = 2)
+  pygame.draw.circle(app_surf, player_two['colour'], player_two['current'], radius = 3, width = 2)
 
 def refresh_window(): # This refreshes the display
   pygame.display.update()
@@ -146,6 +146,11 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
   
 # ----------------- MAIN CODE -----------------
 app_surf, app_surf_rect = create_app_window(800, 800)
+initialise_pygame_coords()
+print('\nThree entities initialised... here is a raw printout of their dictionaries')
+print(destination)
+print(player_one)
+print(player_two)
 
 # Main loop
 print("Hello, welcome to this math game by Sean Chan!")
@@ -253,3 +258,8 @@ RULES:
 
     # Change the turn 
     turn += 1 if turn != 2 else 1 # This changes the turns between 1 and 2.
+
+    # integrate pygame display into this code
+
+    app_surf_update(destination, player_one, player_two)    # call the function to update the app surface with the new coordinates. Send it the entities
+    refresh_window()
