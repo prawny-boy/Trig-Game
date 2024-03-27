@@ -1,11 +1,12 @@
 # imports
-import random, time, sys
+import random, time, sys, pygame
 
 # define dictionaries
 from triples_list import *
 player_one = {
   "name": "one",
   "current": [random.randint(0,0), random.randint(0,0)], # randomises player location
+  "pygame_current": None,
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
@@ -14,6 +15,7 @@ player_one = {
 player_two = {
   "name": "two",
   "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
+  "pygame_current": None,
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
@@ -21,8 +23,47 @@ player_two = {
 }
 destination = {
   "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
+  "pygame_current": None,
   "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
 }
+
+# Pygame fuctions
+pygame.init()
+app_clock = pygame.time.Clock()
+
+def create_app_window(width:int, height:int): # Creates app window, input with two int.
+  pygame.display.set_caption("")
+  app_dimensions = (width + 10, height + 10)
+  app_surf = pygame.display.set_mode(app_dimensions)
+  app_surf_rect = app_surf.get_rect()
+  return app_surf, app_surf_rect
+
+def app_surf_update(destination, player_one, player_two): # draws plane and players
+  app_surf.fill("white") # Fill the display surface with white background.
+  # draw the x and y axis
+  pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
+  pygame.draw.line(app_surf, 'grey',(app_surf_rect.width/2, 0),(app_surf_rect.width/2,app_surf_rect.height),width=1)
+  # draw destination
+  pygame.draw.circle(app_surf, 'black', destination['pygame_coords'], radius = 3, width = 3)
+  # draw player one and player two
+  pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_coords'], radius = 3, width = 2)
+  pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_coords'], radius = 3, width = 2)
+
+def refresh_window(): # This refreshes the display
+  pygame.display.update()
+  app_clock.tick(24)
+
+def conv_cartesian_to_pygame_coords(x, y):
+  pygame_x = x + app_surf_rect.width / 2
+  pygame_y = -y + app_surf_rect.height / 2
+  return(pygame_x, pygame_y)
+
+def initialise_pygame_coords():
+    # initially set the requested coordinates to random values
+    # each time you call randint() you get new random coords
+    player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
+    player_two['pygame_current'] = conv_cartesian_to_pygame_coords(player_two['current'][0], player_two['current'][1])
+    destination['pygame_current'] = conv_cartesian_to_pygame_coords(destination['current'][0], destination['current'][1])
 
 # define functions to calculate distance, midpoint, gradient, space buffer and printing
 def calculate_distance(point1:list, point2:list) -> float: # Gets two points and calculates the distance. Returns a float with 1 decimal.
@@ -102,6 +143,9 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
 # update_dicts()
 # print_stats(player_one)
 # print_stats(player_two)
+  
+# ----------------- MAIN CODE -----------------
+app_surf, app_surf_rect = create_app_window(800, 800)
 
 # Main loop
 print("Hello, welcome to this math game by Sean Chan!")
@@ -207,5 +251,5 @@ RULES:
     elif turn == 3: # for npc
       pass
 
-    # Change the turn
+    # Change the turn 
     turn += 1 if turn != 2 else 1 # This changes the turns between 1 and 2.
