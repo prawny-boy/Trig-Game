@@ -7,6 +7,7 @@ player_one = {
   "name": "one",
   "current": [random.randint(0,0), random.randint(0,0)], # randomises player location
   "pygame_current": None,
+  "colour": "red",
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
@@ -16,6 +17,7 @@ player_two = {
   "name": "two",
   "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
   "pygame_current": None,
+  "colour": "blue",
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
@@ -24,6 +26,7 @@ player_two = {
 destination = {
   "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
   "pygame_current": None,
+  "colour": "black",
   "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
 }
 
@@ -168,7 +171,7 @@ while True:
 'help' -> Displays all commands and what they do.
 'start' -> Starts a new round of the game.
 'rules' -> Prints the rules of the game.
-'quit' -> Quits this program.
+'quit' -> Quits this program. This can be done at any time in the game.
 'npc' -> adds a npc with a certain difficulty. You are also able to select 3 player or 2 player mode with this.
 """)
     elif userInput == "rules": # Instructions on the game.
@@ -201,19 +204,43 @@ RULES:
       print("That is invalid. Enter 'help' for commands.")
   
   # After the menu, this is the game code.
-  input("If you haven't read the rules, it is recommended as you won't know how to play. ")
+  print("If you haven't read the rules, it is recommended as you won't know how to play. ")
   turn = 1
   gameInProgress = True
   while gameInProgress:
 
     # Get move from player.
-    move = input(f"Player {turn}! Make your move: ")
-    if "quit" in move.lower(): # just in case player wants to quit.
-      print("Bye!\n")
-      sys.exit()
-    move = move.split(" ")
-    distance = int(move[0])
-    direction = int(move[1])
+    inputting = True
+    while inputting:
+      move = input(f"Player {turn}! Make your move: ")
+
+      if "quit" in move.lower(): # just in case player wants to quit.
+        print("Bye!\n")
+        sys.exit()
+      
+      move = move.split(" ")
+
+      try:
+        direction = int(move[1])
+        distance = int(move[0])
+      except IndexError:
+        print("That is invalid. Please enter in format 'distance<space>direction'.")
+        continue
+      except TypeError:
+        print("That was invalid, it has to be numbers.")
+        continue
+      
+
+      if distance < 0:
+        print("The distance was negative. Please re-enter.")
+      elif distance < 5: # Just in case if it is less then 5
+        print("The distance was less than 5. Please re-enter.")
+      elif not direction < 9 and not direction > 0:
+        print("The direction must be 1-8. Read rules for more details.")
+      elif distance > 800 or distance < 0:
+        print("Distance must be from 0 to 800.")
+      else:
+        inputting = False
 
     # Find triple
     isFound = False
@@ -257,9 +284,9 @@ RULES:
       pass
 
     # Change the turn 
-    turn += 1 if turn != 2 else 1 # This changes the turns between 1 and 2.
+    turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
 
     # integrate pygame display into this code
 
-    app_surf_update(destination, player_one, player_two)    # call the function to update the app surface with the new coordinates. Send it the entities
+    app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
     refresh_window()
