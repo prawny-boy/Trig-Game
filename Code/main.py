@@ -136,10 +136,8 @@ def draw_plane(): # redraws the cartesian plane with player points on top.
 
 def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordinates in a certain amount of x and certain amount of y.
   if player_num == 1:
-    player_one["pygame_current"] = conv_cartesian_to_pygame_coords(player_one["current"][0] + x_add, player_one["current"][1] + y_add)
     player_one["current"] = [player_one["current"][0] + x_add, player_one["current"][1] + y_add]
   elif player_num == 2:
-    player_two["pygame_current"] = conv_cartesian_to_pygame_coords(player_two["current"][0] + x_add, player_two["current"][1] + y_add)
     player_two["current"] = [player_two["current"][0] + x_add, player_two["current"][1] + y_add]
   elif player_num == 3: # NPC update as player 3
     pass
@@ -152,6 +150,8 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
 # ----------------- MAIN CODE -----------------
 app_surf, app_surf_rect = create_app_window(800, 800)
 initialise_pygame_coords()
+app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+refresh_window()
 print("Hello, welcome to this math game by Sean Chan!")
 
 # Main loop
@@ -270,20 +270,18 @@ RULES:
 
     # Update dictionaries and stats
     update_dicts()
+    initialise_pygame_coords()
+
     if turn == 1: # prints the stats of the player.
       print_stats(player_one)
     elif turn == 2:
       print_stats(player_two)
     elif turn == 3: # for npc
       pass
-    
-    # Update Screen
 
-
-    # Change the turn 
-    turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
-
-    # integrate pygame display into this code
-
+    # Refresh screen
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
     refresh_window()
+    
+    # Change the turn 
+    turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
