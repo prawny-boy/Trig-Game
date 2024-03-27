@@ -15,7 +15,7 @@ player_one = {
 }
 player_two = {
   "name": "two",
-  "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
+  "current": [random.randint(-400, 400), random.randint(-400, 400)], # randomises player location
   "pygame_current": None,
   "colour": "blue",
   "distance": 0.0,
@@ -24,7 +24,7 @@ player_two = {
   "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
 }
 destination = {
-  "current": [random.randint(-800, 800), random.randint(-800, 800)], # randomises player location
+  "current": [random.randint(-400, 400), random.randint(-400, 400)], # randomises player location
   "pygame_current": None,
   "colour": "black",
   "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
@@ -47,10 +47,10 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
   pygame.draw.line(app_surf, 'grey',(app_surf_rect.width/2, 0),(app_surf_rect.width/2,app_surf_rect.height),width=1)
   # draw destination
-  pygame.draw.circle(app_surf, 'black', destination['current'], radius = 3, width = 3)
+  pygame.draw.circle(app_surf, 'black', destination['pygame_current'], radius = 3, width = 3)
   # draw player one and player two
-  pygame.draw.circle(app_surf, player_one['colour'], player_one['current'], radius = 3, width = 2)
-  pygame.draw.circle(app_surf, player_two['colour'], player_two['current'], radius = 3, width = 2)
+  pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = 3, width = 2)
+  pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = 3, width = 2)
 
 def refresh_window(): # This refreshes the display
   pygame.display.update()
@@ -136,8 +136,10 @@ def draw_plane(): # redraws the cartesian plane with player points on top.
 
 def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordinates in a certain amount of x and certain amount of y.
   if player_num == 1:
+    player_one["pygame_current"] = conv_cartesian_to_pygame_coords(player_one["current"][0] + x_add, player_one["current"][1] + y_add)
     player_one["current"] = [player_one["current"][0] + x_add, player_one["current"][1] + y_add]
   elif player_num == 2:
+    player_two["pygame_current"] = conv_cartesian_to_pygame_coords(player_two["current"][0] + x_add, player_two["current"][1] + y_add)
     player_two["current"] = [player_two["current"][0] + x_add, player_two["current"][1] + y_add]
   elif player_num == 3: # NPC update as player 3
     pass
@@ -150,13 +152,9 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
 # ----------------- MAIN CODE -----------------
 app_surf, app_surf_rect = create_app_window(800, 800)
 initialise_pygame_coords()
-print('\nThree entities initialised... here is a raw printout of their dictionaries')
-print(destination)
-print(player_one)
-print(player_two)
+print("Hello, welcome to this math game by Sean Chan!")
 
 # Main loop
-print("Hello, welcome to this math game by Sean Chan!")
 while True:
 
   # This is the main (text based) menu of the game
@@ -221,21 +219,17 @@ RULES:
       move = move.split(" ")
 
       try:
-        direction = int(move[1])
         distance = int(move[0])
-      except IndexError:
-        print("That is invalid. Please enter in format 'distance<space>direction'.")
-        continue
-      except TypeError:
-        print("That was invalid, it has to be numbers.")
+        direction = int(move[1])
+      except:
+        print("Please enter in format 'distance<space>direction' where distance and directions are numbers.")
         continue
       
-
       if distance < 0:
         print("The distance was negative. Please re-enter.")
       elif distance < 5: # Just in case if it is less then 5
         print("The distance was less than 5. Please re-enter.")
-      elif not direction < 9 and not direction > 0:
+      elif direction > 8 or direction < 1:
         print("The direction must be 1-8. Read rules for more details.")
       elif distance > 800 or distance < 0:
         print("Distance must be from 0 to 800.")
@@ -282,6 +276,9 @@ RULES:
       print_stats(player_two)
     elif turn == 3: # for npc
       pass
+    
+    # Update Screen
+
 
     # Change the turn 
     turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.

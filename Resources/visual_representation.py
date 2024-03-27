@@ -29,7 +29,7 @@ def app_surf_update(destination, player_one, player_two):
     
     # draw destination
     # pygame.draw.circle() needs the surface to draw on, colour, coordinates, circle radius and line width
-    pygame.draw.circle(app_surf, 'black',destination['pygame_coords'], radius = 3, width = 3)
+    pygame.draw.circle(app_surf, 'black', destination['pygame_coords'], radius = 3, width = 3)
 
     # draw player one and player two
     pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_coords'], radius = 3, width = 2)
@@ -90,7 +90,7 @@ destination={
 }
 
 # create the app window
-app_surf, app_surf_rect = create_app_window(800, 800)
+app_surf, app_surf_rect = create_app_window(1600, 1600)
 # these two are now global variables that everyone can access
 
 initialise_entities()
