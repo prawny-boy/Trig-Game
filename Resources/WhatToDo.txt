@@ -49,3 +49,8 @@ More:
   Submit through a presentation 
   Use functions, no import except numpy, random and time
   NPC can be added for more marks
+
+
+Commit:
+  Removed the space buffer calculation as it is not needed to check if the player is 10 or less units from the destination or other player.
+  Changed the personal in dictionaries to become a integer which is the distance of the buffer.

@@ -11,7 +11,7 @@ player_one = {
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
-  "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
+  "personal": 10 # sets the distance of the personal space buffer
 }
 player_two = {
   "name": "two",
@@ -21,13 +21,13 @@ player_two = {
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
-  "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
+  "personal": 10 # sets the distance of the personal space buffer
 }
 destination = {
   "current": [random.randint(-400, 400), random.randint(-400, 400)], # randomises player location
   "pygame_current": None,
   "colour": "black",
-  "personal": [[0,0],[0,0]] # sets two coordinates that are going to be the top left and bottom right of the personal space buffer.
+  "personal": 10 # sets the distance of the personal space buffer
 }
 
 # Pygame fuctions
@@ -97,10 +97,6 @@ def calculate_gradient(point1:list, point2:list) -> float: # Gets two points and
   except: # if there is a error, means that it is undefined
     gradient = "undefined"
     return gradient # returns the undefined value.
-
-def calculate_space_buffer(point:list) -> list: # Calculates the space buffer of 10 units, returns two coords as a list: [[x,y],[x2,y2]] being top left and bottom right.
-  buffer_side = 5
-  return list
 
 def update_dicts():
   # player 1 update
