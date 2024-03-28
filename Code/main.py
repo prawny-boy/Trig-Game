@@ -152,9 +152,11 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
 # ----------------- MAIN CODE -----------------
 print("Hello, welcome to this math game by Sean Chan!")
 
+# Initalise some default settings
+size_of_grid = 400
+
 # Main loop
 while True:
-
   # quits the display, this is for replaying.
   pygame.display.quit()
 
@@ -207,13 +209,41 @@ RULES:
         print("""
 Enter a command to edit:
 'rounding' -> Not completed
-'size' -> Not completed
+'size' -> changes the size of the grid. This also changes the player coords to be random.
 'colours' -> Not completed
 'back' -> Go back
 """)
         editAnswer = input("Command: ").strip().lower()
         if editAnswer == "back":
           break
+        elif editAnswer == "size":
+          sizeSelect = True
+          while sizeSelect:
+            sizeAnswer = input("Select the size of the grid. (200 to 1000): ").strip()
+            try:
+              sizeAnswer = int(sizeAnswer)
+            except:
+              if sizeAnswer.lower() == "quit":
+                pygame.quit()
+                sys.exit()
+              elif sizeAnswer.lower() in ["back", ""]:
+                print("You have been sent back.")
+                break
+              else:
+                print("Has to be a whole number. Try Again.")
+                continue
+
+            if sizeAnswer > 1000 or sizeAnswer < 200:
+              print("From 200 to 1000. Try again.")
+            else:
+              size_of_grid = round(sizeAnswer/2)
+              # Reset coordinates
+              player_one["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)]
+              player_two["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)]
+              destination["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)]
+              print(f"Size of grid has been set to {str(sizeAnswer)}.")
+              break
+
         elif editAnswer == "quit":
           pygame.quit()
           sys.exit()
@@ -223,13 +253,13 @@ Enter a command to edit:
       print("That is invalid. Enter 'help' for commands.")
   
   # After the menu, this is the game code.
-  print("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)")
+  print("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)") # print out some early texts to show players.
   print("""Player 1, you are red. 
 Player 2, you are blue.""")
-  print("Click the screen to start the game.")
+  print("Click the screen to start the game.") # tells players to click the screen
 
   # Initalise pygame display
-  app_surf, app_surf_rect = create_app_window(800, 800)
+  app_surf, app_surf_rect = create_app_window(size_of_grid*2,size_of_grid*2)
   make_pygame_coords()
   app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
   refresh_window()
@@ -270,8 +300,8 @@ Player 2, you are blue.""")
             print("The distance was less than 5. Please re-enter.")
           elif direction > 8 or direction < 1:
             print("The direction must be 1-8. Read rules for more details.")
-          elif distance > 800 or distance < 0:
-            print("Distance must be from 0 to 800.")
+          elif distance > size_of_grid*2 or distance < 0:
+            print(f"Distance must be from 0 to {size_of_grid*2}.")
           else:
             inputting = False
 
