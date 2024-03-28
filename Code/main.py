@@ -5,7 +5,7 @@ import random, time, sys, pygame
 from triples_list import *
 player_one = {
   "name": "one",
-  "current": [random.randint(0,0), random.randint(0,0)], # randomises player location
+  "current": [random.randint(0,0), random.randint(-400, 400)], # randomises player location
   "pygame_current": None,
   "colour": "red",
   "distance": 0.0,
@@ -117,14 +117,14 @@ Distance to destination: {player_dict["distance"]} units
 Gradient with destination: {player_dict["gradient"]}
 """)
 
-def check_destination_win(player_dict:dict, destination_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
-  if calculate_distance(player_dict["current"], destination_dict["current"]) <= 10:
+def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
+  if player_dict["distance"] <= player_dict["personal"]:
     return True
   else:
     return False
 
 def check_player_win(player_dict:dict, other_player_dict:dict) -> bool: # Gets a player_dict and checks if that player won through getting into another player's space. returns a boolean.
-  if calculate_distance(player_dict["current"], other_player_dict["current"]) <= 10:
+  if calculate_distance(player_dict["current"], other_player_dict["current"]) <= player_dict["personal"]:
     return True
   else:
     return False
@@ -155,6 +155,9 @@ print("Hello, welcome to this math game by Sean Chan!")
 # Main loop
 while True:
 
+  # quits the display, this is for replaying.
+  pygame.display.quit()
+
   # This is the main (text based) menu of the game
   menu = True
   while menu:
@@ -167,8 +170,9 @@ while True:
 'help' -> Displays all commands and what they do.
 'start' -> Starts a new round of the game.
 'rules' -> Prints the rules of the game.
-'quit' -> Quits this program. This can be done at any time in the game.
+'quit' -> Quits this program. This can be done at any time (any input) in the game.
 'npc' -> adds a npc with a certain difficulty. You are also able to select 3 player or 2 player mode with this.
+'extra' -> Shows some extra options to edit gameplay.
 """)
     elif userInput == "rules": # Instructions on the game.
       print("""
@@ -193,14 +197,36 @@ RULES:
 """)
     elif userInput == "quit":
       print("Bye!\n")
+      pygame.quit()
       sys.exit()
     elif userInput == "npc":
       print("That has not been completed yet. Please try again in later versions.")
+    elif userInput == "extra":
+      extraRunning = True
+      while extraRunning:
+        print("""
+Enter a command to edit:
+'rounding' -> Not completed
+'size' -> Not completed
+'colours' -> Not completed
+'back' -> Go back
+""")
+        editAnswer = input("Command: ").strip().lower()
+        if editAnswer == "back":
+          break
+        elif editAnswer == "quit":
+          pygame.quit()
+          sys.exit()
+        else: # add other functions later
+          print("That is not a command. See list for details:")
     else:
       print("That is invalid. Enter 'help' for commands.")
   
   # After the menu, this is the game code.
-  print("If you haven't read the rules, it is recommended as you won't know how to play. ")
+  print("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)")
+  print("""Player 1, you are red. 
+Player 2, you are blue.""")
+  print("Click the screen to start the game.")
 
   # Initalise pygame display
   app_surf, app_surf_rect = create_app_window(800, 800)
@@ -218,119 +244,125 @@ RULES:
       if event.type == pygame.QUIT:   # must have this else the user can't quit.
         pygame.quit()
         sys.exit()
-    pygame.event.pump()
+      if event.type == pygame.MOUSEBUTTONDOWN:
 
-    # Get move from player.
-    inputting = True
-    while inputting:
-      move = input(f"Player {turn}! Make your move: ")
+        # Get move from player.
+        inputting = True
+        while inputting:
+          move = input(f"Player {turn}! Make your move: ")
 
-      if "quit" in move.lower(): # just in case player wants to quit.
-        print("Bye!\n")
-        sys.exit()
-      
-      move = move.split(" ")
+          if "quit" in move.lower(): # just in case player wants to quit.
+            print("Bye!\n")
+            sys.exit()
+          
+          move = move.split(" ")
 
-      try:
-        distance = int(move[0])
-        direction = int(move[1])
-      except:
-        print("Please enter in format 'distance<space>direction' where distance and directions are numbers.")
-        continue
-      
-      if distance < 0:
-        print("The distance was negative. Please re-enter.")
-      elif distance < 5: # Just in case if it is less then 5
-        print("The distance was less than 5. Please re-enter.")
-      elif direction > 8 or direction < 1:
-        print("The direction must be 1-8. Read rules for more details.")
-      elif distance > 800 or distance < 0:
-        print("Distance must be from 0 to 800.")
-      else:
-        inputting = False
+          try:
+            distance = int(move[0])
+            direction = int(move[1])
+          except:
+            print("Please enter in format 'distance<space>direction' where distance and directions are numbers.")
+            continue
+          
+          if distance < 0:
+            print("The distance was negative. Please re-enter.")
+          elif distance < 5: # Just in case if it is less then 5
+            print("The distance was less than 5. Please re-enter.")
+          elif direction > 8 or direction < 1:
+            print("The direction must be 1-8. Read rules for more details.")
+          elif distance > 800 or distance < 0:
+            print("Distance must be from 0 to 800.")
+          else:
+            inputting = False
 
-    # Find triple
-    isFound = False
-    for num in range(100): # The 100 here is to ensure a triple is picked.
-      for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
-        if triple[2] == (distance - num): # This checks for the triple with the distance with subtracting every time it is looped.
-          a = triple[0] # if the triple is matching, save the a and b sides.
-          b = triple[1]
-          isFound = True # allows us to break from the second loop.
-          break
-      if isFound == True: # only occurs if the triple is found
-        break
-    
-    # Use direction to move to a coordinate.
-    if direction % 2 == 0: # if the direction is even, flip a and b.
-      a, b = b, a # flips the variables so a=b and b=a
-    if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
-      a = abs(a)
-      b = abs(b)
-      update_coords(b, a, turn)
-    elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
-      a = -abs(a)
-      b = abs(b)
-      update_coords(a, b, turn)
-    elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
-      a = -abs(a)
-      b = -abs(b)
-      update_coords(b, a, turn)
-    elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
-      a = abs(a)
-      b = -abs(b)
-      update_coords(a, b, turn)
+        # Find triple
+        isFound = False
+        for num in range(100): # The 100 here is to ensure a triple is picked.
+          for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
+            if triple[2] == (distance - num): # This checks for the triple with the distance with subtracting every time it is looped.
+              a = triple[0] # if the triple is matching, save the a and b sides.
+              b = triple[1]
+              isFound = True # allows us to break from the second loop.
+              break
+          if isFound == True: # only occurs if the triple is found
+            break
+        
+        # Use direction to move to a coordinate.
+        if direction % 2 == 0: # if the direction is even, flip a and b.
+          a, b = b, a # flips the variables so a=b and b=a
+        if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
+          a = abs(a)
+          b = abs(b)
+          update_coords(b, a, turn)
+        elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
+          a = -abs(a)
+          b = abs(b)
+          update_coords(a, b, turn)
+        elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
+          a = -abs(a)
+          b = -abs(b)
+          update_coords(b, a, turn)
+        elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
+          a = abs(a)
+          b = -abs(b)
+          update_coords(a, b, turn)
 
-    # Update dictionaries and stats
-    update_dicts()
-    
-    # Check for win and submit to variables and print accordingly.
-    destinationWin = False
-    playerWin = False
-    if turn == 1: # prints the stats of the player.
-      print_stats(player_one)
-      destinationWin = check_destination_win(player_one, destination) # Check if the player won.
-      playerWin = check_player_win(player_one, player_two)
-    elif turn == 2:
-      print_stats(player_two)
-      destinationWin = check_destination_win(player_one, destination) # Check if the player won.
-      playerWin = check_player_win(player_one, player_two)
-    elif turn == 3: # for npc
-      pass
+        # Update dictionaries and stats
+        update_dicts()
+        
+        # Check for win and submit to variables and print accordingly.
+        destinationWin = False
+        playerWin = False
+        if turn == 1: # prints the stats of the player.
+          print_stats(player_one)
+          destinationWin = check_destination_win(player_one) # Check if the player won.
+          playerWin = check_player_win(player_one, player_two)
+        elif turn == 2:
+          print_stats(player_two)
+          destinationWin = check_destination_win(player_one) # Check if the player won.
+          playerWin = check_player_win(player_one, player_two)
+        elif turn == 3: # for npc
+          pass
 
-    # Refresh screen
-    make_pygame_coords()
-    app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
-    refresh_window()
+        # Refresh screen
+        make_pygame_coords()
+        app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+        refresh_window()
 
-    # Check if the player won
-    if destinationWin: # Win by getting near destination
-      if turn == 1: # Checks which player won.
-        print_stats(player_two)
-        print("Player 1 won because they ended up near the destination!")
-      elif turn == 2:
-        print_stats(player_one)
-        print("Player 2 won because they ended up near the destination!")
-      elif turn == 3: # for npc
-        pass
-    elif playerWin: # Win by getting near player
-      if turn == 1: # Checks which player won.
-        print_stats(player_two)
-        lastInput = input("Player 1 won because they ended up near player 2! Enter to go back to menu.")
-        if lastInput.lower().strip() == "quit": # Just in case they want to exit.
-          sys.exit()
-        else:
-          break
-      elif turn == 2:
-        print_stats(player_one)
-        lastInput = input("Player 2 won because they ended up near player 1! Enter to go back to menu.")
-        if lastInput.lower().strip() == "quit": # Just in case they want to exit.
-          sys.exit()
-        else:
-          break
-      elif turn == 3: # for npc
-        pass
-    
-    
-    # Change the turn 
-    turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
+        # Check if the player won
+        if destinationWin: # Win by getting near destination
+          if turn == 1: # Checks which player won.
+            print_stats(player_two)
+            print("Player 1 won because they ended up near the destination!")
+          elif turn == 2:
+            print_stats(player_one)
+            print("Player 2 won because they ended up near the destination!")
+          elif turn == 3: # for npc
+            pass
+        elif playerWin: # Win by getting near player
+          if turn == 1: # Checks which player won.
+            print_stats(player_two)
+            lastInput = input("Player 1 won because they ended up near player 2! Enter to go back to menu. ")
+            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
+              pygame.quit()
+              sys.exit()
+            else:
+              break
+          elif turn == 2:
+            print_stats(player_one)
+            lastInput = input("Player 2 won because they ended up near player 1! Enter to go back to menu. ")
+            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
+              pygame.quit()
+              sys.exit()
+            else:
+              gameInProgress = False
+              break
+          elif turn == 3: # for npc
+            pass
+        
+        
+        # Change the turn 
+        turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
+
+        # Print the player whose turn it is and tell them to click
+        print(f"Player {turn}, click the screen to move. Close the display to quit.")

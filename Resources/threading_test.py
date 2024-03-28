@@ -9,7 +9,7 @@ class KeyboardThread(threading.Thread):
 
     def run(self):
         while True:
-            self.input_cbk(input()) #waits to get input + Re
+            self.input_cbk(input()) #waits to get input + Returns it
 
 showcounter = 0 #something to demonstrate the change
 
