@@ -103,12 +103,10 @@ def update_dicts():
   player_one["distance"] = calculate_distance(destination["current"], player_one["current"])
   player_one["gradient"] = calculate_gradient(destination["current"], player_one["current"])
   player_one["midpoint"] = calculate_midpoint(player_one["current"], player_two["current"])
-  player_one["personal"] = [[0,0],[0,0]] # change later
   # player 2 update
   player_two["distance"] = calculate_distance(destination["current"], player_two["current"])
   player_two["gradient"] = calculate_gradient(destination["current"], player_two["current"])
   player_two["midpoint"] = calculate_midpoint(player_two["current"], player_one["current"])
-  player_two["personal"] = [[0,0],[0,0]] # change later
 
 def print_stats(player_dict:dict): # prints the stats; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
   print(f"""
@@ -119,11 +117,17 @@ Distance to destination: {player_dict["distance"]} units
 Gradient with destination: {player_dict["gradient"]}
 """)
 
-def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
-  return bool
+def check_destination_win(player_dict:dict, destination_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
+  if calculate_distance(player_dict["current"], destination_dict["current"]) <= 10:
+    return True
+  else:
+    return False
 
-def check_player_win(player_dict:dict) -> bool: # Gets a player_dict and checks if that player won through getting into another player's space. returns a boolean.
-  return bool
+def check_player_win(player_dict:dict, other_player_dict:dict) -> bool: # Gets a player_dict and checks if that player won through getting into another player's space. returns a boolean.
+  if calculate_distance(player_dict["current"], other_player_dict["current"]) <= 10:
+    return True
+  else:
+    return False
 
 def draw_plane(): # redraws the cartesian plane with player points on top. 
   x_size = 1600 # size of the grid, -800 to 800
@@ -267,17 +271,53 @@ RULES:
     # Update dictionaries and stats
     update_dicts()
     initialise_pygame_coords()
-
+    
+    # Check for win and submit to variables and print accordingly.
+    destinationWin = False
+    playerWin = False
     if turn == 1: # prints the stats of the player.
       print_stats(player_one)
+      destinationWin = check_destination_win(player_one, destination) # Check if the player won.
+      playerWin = check_player_win(player_one, player_two)
     elif turn == 2:
       print_stats(player_two)
+      destinationWin = check_destination_win(player_one, destination) # Check if the player won.
+      playerWin = check_player_win(player_one, player_two)
     elif turn == 3: # for npc
       pass
 
     # Refresh screen
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
     refresh_window()
+
+    # Check if the player won
+    if destinationWin: # Win by getting near destination
+      if turn == 1: # Checks which player won.
+        print_stats(player_two)
+        print("Player 1 won because they ended up near the destination!")
+      elif turn == 2:
+        print_stats(player_one)
+        print("Player 2 won because they ended up near the destination!")
+      elif turn == 3: # for npc
+        pass
+    elif playerWin: # Win by getting near player
+      if turn == 1: # Checks which player won.
+        print_stats(player_two)
+        lastInput = input("Player 1 won because they ended up near player 2! Enter to go back to menu.")
+        if lastInput.lower().strip() == "quit": # Just in case they want to exit.
+          sys.exit()
+        else:
+          break
+      elif turn == 2:
+        print_stats(player_one)
+        lastInput = input("Player 2 won because they ended up near player 1! Enter to go back to menu.")
+        if lastInput.lower().strip() == "quit": # Just in case they want to exit.
+          sys.exit()
+        else:
+          break
+      elif turn == 3: # for npc
+        pass
+    
     
     # Change the turn 
     turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
