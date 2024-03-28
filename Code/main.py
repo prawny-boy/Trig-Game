@@ -61,7 +61,7 @@ def conv_cartesian_to_pygame_coords(x, y):
   pygame_y = -y + app_surf_rect.height / 2
   return(pygame_x, pygame_y)
 
-def initialise_pygame_coords():
+def make_pygame_coords():
     # initially set the requested coordinates to random values
     # each time you call randint() you get new random coords
     player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
@@ -146,12 +146,10 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
 # update_dicts()
 # print_stats(player_one)
 # print_stats(player_two)
+# update_coords(100, 0, 1)
+# 
   
 # ----------------- MAIN CODE -----------------
-app_surf, app_surf_rect = create_app_window(800, 800)
-initialise_pygame_coords()
-app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
-refresh_window()
 print("Hello, welcome to this math game by Sean Chan!")
 
 # Main loop
@@ -203,6 +201,14 @@ RULES:
   
   # After the menu, this is the game code.
   print("If you haven't read the rules, it is recommended as you won't know how to play. ")
+
+  # Initalise pygame display
+  app_surf, app_surf_rect = create_app_window(800, 800)
+  make_pygame_coords()
+  app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+  refresh_window()
+
+  # Start turns
   turn = 1
   gameInProgress = True
   while gameInProgress:
@@ -270,7 +276,6 @@ RULES:
 
     # Update dictionaries and stats
     update_dicts()
-    initialise_pygame_coords()
     
     # Check for win and submit to variables and print accordingly.
     destinationWin = False
@@ -287,6 +292,7 @@ RULES:
       pass
 
     # Refresh screen
+    make_pygame_coords()
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
     refresh_window()
 

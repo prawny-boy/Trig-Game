@@ -90,7 +90,7 @@ destination={
 }
 
 # create the app window
-app_surf, app_surf_rect = create_app_window(1600, 1600)
+app_surf, app_surf_rect = create_app_window(800, 800)
 # these two are now global variables that everyone can access
 
 initialise_entities()
