@@ -35,7 +35,7 @@ pygame.init()
 app_clock = pygame.time.Clock()
 
 def create_app_window(width:int, height:int): # Creates app window, input with two int.
-  pygame.display.set_caption("")
+  pygame.display.set_caption("Game")
   app_dimensions = (width + 10, height + 10)
   app_surf = pygame.display.set_mode(app_dimensions)
   app_surf_rect = app_surf.get_rect()
@@ -54,7 +54,7 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
 
 def refresh_window(): # This refreshes the display
   pygame.display.update()
-  app_clock.tick(24)
+  app_clock.tick(30)
 
 def conv_cartesian_to_pygame_coords(x, y):
   pygame_x = x + app_surf_rect.width / 2
@@ -212,6 +212,13 @@ RULES:
   turn = 1
   gameInProgress = True
   while gameInProgress:
+
+    # Pygame pump
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:   # must have this else the user can't quit.
+        pygame.quit()
+        sys.exit()
+    pygame.event.pump()
 
     # Get move from player.
     inputting = True
