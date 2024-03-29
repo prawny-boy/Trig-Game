@@ -4,30 +4,30 @@ import random, time, sys, pygame
 # define dictionaries
 from triples_list import *
 player_one = {
-  "name": "one",
-  "current": [random.randint(0,0), random.randint(-400, 400)], # randomises player location
+  "name": "one", # only used for printing the stats
+  "current": [0, 0], # sets current to origin for now
   "pygame_current": None,
-  "colour": "red",
+  "colour": None,
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
-  "personal": 10 # sets the distance of the personal space buffer
+  "personal": 0 # 0 for now
 }
 player_two = {
-  "name": "two",
-  "current": [random.randint(-400, 400), random.randint(-400, 400)], # randomises player location
+  "name": "two", # only used for printing the stats
+  "current": [0, 0], # sets current to origin for now
   "pygame_current": None,
-  "colour": "blue",
+  "colour": None,
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
-  "personal": 10 # sets the distance of the personal space buffer
+  "personal": 0 # 0 for now
 }
 destination = {
-  "current": [random.randint(-400, 400), random.randint(-400, 400)], # randomises player location
+  "current": [0, 0], # sets current to origin for now
   "pygame_current": None,
-  "colour": "black",
-  "personal": 10 # sets the distance of the personal space buffer
+  "colour": None,
+  "personal": 0 # 0 for now
 }
 
 # Pygame fuctions
@@ -62,11 +62,9 @@ def conv_cartesian_to_pygame_coords(x, y):
   return(pygame_x, pygame_y)
 
 def make_pygame_coords():
-    # initially set the requested coordinates to random values
-    # each time you call randint() you get new random coords
-    player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
-    player_two['pygame_current'] = conv_cartesian_to_pygame_coords(player_two['current'][0], player_two['current'][1])
-    destination['pygame_current'] = conv_cartesian_to_pygame_coords(destination['current'][0], destination['current'][1])
+  player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
+  player_two['pygame_current'] = conv_cartesian_to_pygame_coords(player_two['current'][0], player_two['current'][1])
+  destination['pygame_current'] = conv_cartesian_to_pygame_coords(destination['current'][0], destination['current'][1])
 
 # define functions to calculate distance, midpoint, gradient, space buffer and printing
 def calculate_distance(point1:list, point2:list) -> float: # Gets two points and calculates the distance. Returns a float with 1 decimal.
@@ -107,6 +105,22 @@ def update_dicts():
   player_two["distance"] = calculate_distance(destination["current"], player_two["current"])
   player_two["gradient"] = calculate_gradient(destination["current"], player_two["current"])
   player_two["midpoint"] = calculate_midpoint(player_two["current"], player_one["current"])
+  # update colours
+  player_one["colour"] = colour[0] # sets the colour of each player/destination
+  player_two["colour"] = colour[1] # sets the colour of each player/destination
+  destination["colour"] = colour[2] # sets the colour of each player/destination
+  # update the personal space buffer
+  player_one["personal"] = distance_to_win # sets the distance of the personal space buffer
+  player_two["personal"] = distance_to_win # sets the distance of the personal space buffer
+  destination["personal"] = distance_to_win # sets the distance of the personal space buffer
+
+def reset_dicts():
+  # reset current coordinates
+  player_one["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
+  player_two["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
+  destination["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
+  # For others
+  update_dicts()
 
 def print_stats(player_dict:dict): # prints the stats; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
   print(f"""
@@ -154,6 +168,8 @@ print("Hello, welcome to this math game by Sean Chan!")
 
 # Initalise some default settings
 size_of_grid = 400
+colour = ["red", "blue", "black"]
+distance_to_win = 10
 
 # Main loop
 while True:
@@ -238,9 +254,8 @@ Enter a command to edit:
             else:
               size_of_grid = round(sizeAnswer/2)
               # Reset coordinates
-              player_one["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)]
-              player_two["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)]
-              destination["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)]
+              reset_dicts()
+
               print(f"Size of grid has been set to {str(sizeAnswer)}.")
               break
 
@@ -257,6 +272,9 @@ Enter a command to edit:
   print("""Player 1, you are red. 
 Player 2, you are blue.""")
   print("Click the screen to start the game.") # tells players to click the screen
+
+  # restart. this is for resetting the dictionaries
+  reset_dicts()
 
   # Initalise pygame display
   app_surf, app_surf_rect = create_app_window(size_of_grid*2,size_of_grid*2)
@@ -377,6 +395,7 @@ Player 2, you are blue.""")
               pygame.quit()
               sys.exit()
             else:
+              gameInProgress = False
               break
           elif turn == 2:
             print_stats(player_one)
@@ -396,3 +415,7 @@ Player 2, you are blue.""")
 
         # Print the player whose turn it is and tell them to click
         print(f"Player {turn}, click the screen to move. Close the display to quit.")
+
+    make_pygame_coords()
+    app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+    refresh_window()
