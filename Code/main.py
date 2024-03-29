@@ -472,9 +472,12 @@ Enter a command to edit:
 
         else: # If it is the NPC's turn
           print("NPC turn:", end=" ")
-          time.sleep(1)
           move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
-          print(move)
+          for char in move:
+            print(char, end="")
+            sys.stdout.flush()
+            time.sleep(random.random() / 3)
+          print("")
           move = move.split(" ")
 
         # Find triple
