@@ -159,8 +159,33 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
   elif player_num == 3: # NPC update as player 3
     pass
 
-def npc_move(distance:float, gradient:float, difficulty:int) -> str: # calculates the move for the npc and returns str in the format distance<space>direction.
-  return str
+def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_x) -> str: # calculates the move for the npc and returns str in the format distance<space>direction.
+  # difficulty code
+  randomised = False 
+  if difficulty == 1:
+    if random.randint(0, 2) == 0:
+      randomised = True
+  elif difficulty == 2:
+    if random.randint(0, 5) == 0:
+      randomised = True
+  if randomised == True:
+    return str(random.randint(5, 800)) + " " + str(random.randint(1, 8))
+  # actual movement (direction)
+  if gradient >= 0: # Means quadrant 1 or 3
+    if gradient >= 1: # Means direction 2 or 6
+      direction = "6" if npc_x < destination_x else "2"
+    else: # Means direction 1 or 5
+      direction = "5" if npc_x < destination_x else "1"
+  else: # Means quadrant 4 or 2
+    if gradient <= -1: # Means direction 7 or 3
+      direction = "3" if npc_x < destination_x else "7"
+    else: # Means direction 8 or 4
+      direction = "4" if npc_x < destination_x else "8"
+  # actual movement (distance)
+  distance = round(distance)
+  if distance > 800:
+    distance = 800
+  return str(distance) + " " + direction
 
 # testing functions
 # update_dicts()
@@ -381,9 +406,9 @@ Enter a command to edit:
             else:
               inputting = False
         else: # If it is the NPC's turn
-          print(f"NPC turn:", end=" ")
+          print("NPC turn:", end=" ")
           time.sleep(1)
-          move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty)
+          move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
           print(move)
           move = move.split(" ")
 
@@ -443,10 +468,22 @@ Enter a command to edit:
         if destinationWin: # Win by getting near destination
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            print("Player 1 won because they ended up near the destination!")
+            lastInput = input("Player 1 won because they ended up near the destination! Enter to go back to menu.")
+            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
+              pygame.quit()
+              sys.exit()
+            else:
+              gameInProgress = False
+              break
           elif turn == 2:
             print_stats(player_one)
-            print(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination!")
+            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu.")
+            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
+              pygame.quit()
+              sys.exit()
+            else:
+              gameInProgress = False
+              break
         elif playerWin: # Win by getting near player
           if turn == 1: # Checks which player won.
             print_stats(player_two)
@@ -472,10 +509,10 @@ Enter a command to edit:
         turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
 
         # Print the player whose turn it is and tell them to click
-        if npc_mode == False:
+        if npc_mode == False or turn == 1:
           print(f"Player {turn}, click the screen to move. Close the display to quit.")
         else:
-          print("It's the NPC's turn!")
+          print("It's the NPC's turn! Click to continue.")
 
     make_pygame_coords()
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities

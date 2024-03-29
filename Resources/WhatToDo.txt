@@ -55,6 +55,7 @@ Todo:
   time penalty of 10 sec, pick random instead
   make sure all inputs cannot be broken
   print in colour
+  make npc attempt to go to other player?
   write comments on every important line
   run import this
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)
