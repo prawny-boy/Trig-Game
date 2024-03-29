@@ -51,8 +51,6 @@ More:
   NPC can be added for more marks
 
 Todo:
-  design algorithm for npc
-  implement npc
   finish menu commands
   time penalty of 10 sec, pick random instead
   make sure all inputs cannot be broken

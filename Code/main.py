@@ -230,7 +230,7 @@ RULES:
         print("""
 Enter a command to edit:
 'npc'         -> Toggles npc or no npc.
-'npc.level'   -> Selects the difficulty of the npc. It defaults to 1 (the easiest). (Not completed)
+'npc.level'   -> Selects the difficulty of the npc. It defaults to 1 (the easiest).
 'rounding'    -> Changes rounding to triple, up or down. (Not completed)
 'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random.
 'size.player' -> Changes the size of the players and destination. (Not completed)
@@ -294,6 +294,22 @@ Enter a command to edit:
             npc_mode = False
             if input("NPC mode has been turned off. Enter to continue: ").lower().strip() == "quit":
               sys.exit()
+        elif editAnswer == "npc.level":
+          while True:
+            levelSelect = input("Enter new difficulty of NPC. (1-3): ").strip()
+            if levelSelect == "quit":
+              sys.exit()
+            try:
+              levelSelect = int(levelSelect)
+            except:
+              print("Must be a number.")
+              continue
+            if levelSelect >= 1 and levelSelect <= 3:
+              print(f"Successfully selected difficulty to be {levelSelect}.")
+              npc_difficulty = levelSelect
+              break
+            else:
+              print("Must be a number from 1 to 3.")
         elif editAnswer == "quit":
           pygame.quit()
           sys.exit()
