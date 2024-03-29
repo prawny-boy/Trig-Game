@@ -1,5 +1,6 @@
 # imports
-import random, time, sys, pygame
+import random, time, sys, pygame, msvcrt
+from timeout_input import *
 
 # define dictionaries
 from triples_list import *
@@ -172,7 +173,7 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
     if random.randint(0, 5) == 0:
       randomised = True
   if randomised == True:
-    return str(random.randint(5, 800)) + " " + str(random.randint(1, 8))
+    return str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
   # actual movement (direction)
   if gradient >= 0: # Means quadrant 1 or 3
     if gradient >= 1: # Means direction 2 or 6
@@ -207,7 +208,6 @@ Turn Timeout:     {timeout} seconds.
 # print_stats(player_one)
 # print_stats(player_two)
 # update_coords(100, 0, 1)
-# 
   
 # ----------------- MAIN CODE -----------------
 print("Hello, welcome to this math game by Sean Chan!")
@@ -264,7 +264,6 @@ RULES:
   -> Cartesian direction means that 0 degrees is East and the positive direction is counter-clockwise.
 """)
     elif userInput == "quit":
-      print("Bye!\n")
       pygame.quit()
       sys.exit()
     elif userInput == "settings":
@@ -439,18 +438,26 @@ Enter a command to edit:
 
     # Pygame pump
     for event in pygame.event.get():
-      if event.type == pygame.QUIT:   # must have this else the user can't quit.
+      if event.type == pygame.QUIT: # must have this else the user can't quit.
         pygame.quit()
         sys.exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
+        move = None
         if npc_mode == False or turn == 1:
           # Get move from player.
           inputting = True
           while inputting:
-            move = input(f"Player {turn}! Make your move: ")
+
+            try:
+              move = input_with_timeout(f"Player {turn}! Make your move: ", timeout)
+              print("")
+            except TimeoutExpired:
+              print("\nTimes up. Picking random triple.")
+              move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
+              print(f"Selected: {move}")
 
             if "quit" in move.lower(): # just in case player wants to quit.
-              print("Bye!\n")
+              pygame.quit()
               sys.exit()
             
             move = move.split(" ")
