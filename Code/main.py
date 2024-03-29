@@ -13,7 +13,7 @@ player_one = {
   "midpoint": [0, 0],
   "personal": 0 # 0 for now
 }
-player_two = {
+player_two = { # This dictionary can act as the npc when in npc mode.
   "name": "two", # only used for printing the stats
   "current": [0, 0], # sets current to origin for now
   "pygame_current": None,
@@ -23,6 +23,7 @@ player_two = {
   "midpoint": [0, 0],
   "personal": 0 # 0 for now
 }
+
 destination = {
   "current": [0, 0], # sets current to origin for now
   "pygame_current": None,
@@ -158,6 +159,9 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
   elif player_num == 3: # NPC update as player 3
     pass
 
+def npc_move(distance:float, gradient:float, difficulty:int) -> str: # calculates the move for the npc and returns str in the format distance<space>direction.
+  return str
+
 # testing functions
 # update_dicts()
 # print_stats(player_one)
@@ -172,6 +176,8 @@ print("Hello, welcome to this math game by Sean Chan!")
 size_of_grid = 400
 colour = ["red", "blue", "black"]
 distance_to_win = 10
+npc_mode = False
+npc_difficulty = 1
 
 # Main loop
 while True:
@@ -197,7 +203,7 @@ while True:
       print("""
 RULES:
 1. SETUP
-  -> This is a 2 player game.
+  -> This is a 2 player game. (A NPC can be turned on for 1 player to play with.)
   -> Each player is placed on a random point on a cartesian plane. (-800 to 800 both x and y)
   -> A destination will be also placed at a random point.
 2. AIM
@@ -223,9 +229,8 @@ RULES:
       while extraRunning:
         print("""
 Enter a command to edit:
-'npc'         -> Toggles npc or no npc. (Not completed)
-'npc.player'  -> Selects if the npc will make 3 player mode or just 2 player mode. Defaults to 2 player mode. (Not completed)
-'npc.level'   -> Selects the difficulty of the npc. (Not completed)
+'npc'         -> Toggles npc or no npc.
+'npc.level'   -> Selects the difficulty of the npc. It defaults to 1 (the easiest). (Not completed)
 'rounding'    -> Changes rounding to triple, up or down. (Not completed)
 'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random.
 'size.player' -> Changes the size of the players and destination. (Not completed)
@@ -280,6 +285,15 @@ Enter a command to edit:
                 print("That is not a valid colour. See pygame documentation for whole list of colours.")
             if back:
               break
+        elif editAnswer == "npc":
+          if npc_mode == False:
+            npc_mode = True
+            if input("NPC mode has been turned on. Enter to continue: ").lower().strip() == "quit":
+              sys.exit()
+          else:
+            npc_mode = False
+            if input("NPC mode has been turned off. Enter to continue: ").lower().strip() == "quit":
+              sys.exit()
         elif editAnswer == "quit":
           pygame.quit()
           sys.exit()
@@ -290,8 +304,11 @@ Enter a command to edit:
   
   # After the menu, this is the game code.
   print("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)") # print out some early texts to show players.
-  print(f"""Player 1, you are {colour[0]}. 
-Player 2, you are {colour[1]}.""")
+  print(f"Player 1, you are {colour[0]}.")
+  if npc_mode == True:
+    print(f"The NPC is {colour[1]}.")
+  else:
+    print(f"Player 2, you are {colour[1]}.")
   print("Click the screen to start the game.") # tells players to click the screen
 
   # restart. this is for resetting the dictionaries
@@ -318,35 +335,41 @@ Player 2, you are {colour[1]}.""")
         pygame.quit()
         sys.exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
+        if npc_move == False or turn == 1:
+          # Get move from player.
+          inputting = True
+          while inputting:
+            move = input(f"Player {turn}! Make your move: ")
 
-        # Get move from player.
-        inputting = True
-        while inputting:
-          move = input(f"Player {turn}! Make your move: ")
+            if "quit" in move.lower(): # just in case player wants to quit.
+              print("Bye!\n")
+              sys.exit()
+            
+            move = move.split(" ")
 
-          if "quit" in move.lower(): # just in case player wants to quit.
-            print("Bye!\n")
-            sys.exit()
-          
+            try:
+              distance = int(move[0])
+              direction = int(move[1])
+            except:
+              print("Please enter in format 'distance<space>direction' where distance and directions are numbers.")
+              continue
+            
+            if distance < 0:
+              print("The distance was negative. Please re-enter.")
+            elif distance < 5: # Just in case if it is less then 5
+              print("The distance was less than 5. Please re-enter.")
+            elif direction > 8 or direction < 1:
+              print("The direction must be 1-8. Read rules for more details.")
+            elif distance > size_of_grid*2 or distance < 0:
+              print(f"Distance must be from 0 to {size_of_grid*2}.")
+            else:
+              inputting = False
+        else: # If it is the NPC's turn
+          print(f"NPC turn:", end=" ")
+          time.sleep(1)
+          move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty)
+          print(move)
           move = move.split(" ")
-
-          try:
-            distance = int(move[0])
-            direction = int(move[1])
-          except:
-            print("Please enter in format 'distance<space>direction' where distance and directions are numbers.")
-            continue
-          
-          if distance < 0:
-            print("The distance was negative. Please re-enter.")
-          elif distance < 5: # Just in case if it is less then 5
-            print("The distance was less than 5. Please re-enter.")
-          elif direction > 8 or direction < 1:
-            print("The direction must be 1-8. Read rules for more details.")
-          elif distance > size_of_grid*2 or distance < 0:
-            print(f"Distance must be from 0 to {size_of_grid*2}.")
-          else:
-            inputting = False
 
         # Find triple
         isFound = False
@@ -394,9 +417,7 @@ Player 2, you are {colour[1]}.""")
           print_stats(player_two, destination)
           destinationWin = check_destination_win(player_two) # Check if the player won.
           playerWin = check_player_win(player_two, player_one)
-        elif turn == 3: # for npc
-          pass
-
+        
         # Refresh screen
         make_pygame_coords()
         app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
@@ -409,13 +430,11 @@ Player 2, you are {colour[1]}.""")
             print("Player 1 won because they ended up near the destination!")
           elif turn == 2:
             print_stats(player_one)
-            print("Player 2 won because they ended up near the destination!")
-          elif turn == 3: # for npc
-            pass
+            print(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination!")
         elif playerWin: # Win by getting near player
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            lastInput = input("Player 1 won because they ended up near player 2! Enter to go back to menu. ")
+            lastInput = input(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ")
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
@@ -424,22 +443,23 @@ Player 2, you are {colour[1]}.""")
               break
           elif turn == 2:
             print_stats(player_one)
-            lastInput = input("Player 2 won because they ended up near player 1! Enter to go back to menu. ")
+            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ")
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
             else:
               gameInProgress = False
               break
-          elif turn == 3: # for npc
-            pass
         
         
         # Change the turn 
         turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
 
         # Print the player whose turn it is and tell them to click
-        print(f"Player {turn}, click the screen to move. Close the display to quit.")
+        if npc_mode == False:
+          print(f"Player {turn}, click the screen to move. Close the display to quit.")
+        else:
+          print("It's the NPC's turn!")
 
     make_pygame_coords()
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
