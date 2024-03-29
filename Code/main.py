@@ -204,6 +204,7 @@ distance_to_win = 10
 npc_mode = False
 npc_difficulty = 3
 player_size = 3
+rounding_type = "down"
 
 # Main loop
 while True:
@@ -254,14 +255,15 @@ RULES:
       while True:
         print("""
 Enter a command to edit:
-'npc'         -> Toggles npc or no npc.
-'npc.level'   -> Selects the difficulty of the npc. It defaults to 3 (the hardest).
-'rounding'    -> Changes rounding to triple, up or down. (Not completed)
-'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random.
-'size.player' -> Changes the size of the players and destination. Defaults to 3.
+'npc'         -> Toggles npc or no npc. Default is no npc.
+'npc.level'   -> Selects the difficulty of the npc. Default is 3. (the hardest)
+'rounding'    -> Toggles rounding to triple, up or down. Default is down.
+'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random. The default is 400 pixels.
+'size.player' -> Changes the size of the players and destination. Default is 3 pixels.
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
-'personal'    -> Changes the buffer to win if near either player or destination.
-'time'        -> Changes the timeout for a player taking too long to move. Default is 10. (Not completed)
+'personal'    -> Changes the buffer to win if near either player or destination. Default is 10 units.
+'time'        -> Changes the timeout for a player taking too long to move. This can be turned off. Default is 10 seconds. (Not completed)
+'print'       -> Prints the current settings. (Not completed)
 'back'        -> Go back to previous page.
 """)
         editAnswer = input("Command: ").strip().lower()
@@ -372,9 +374,18 @@ Enter a command to edit:
               distance_to_win = personalAnswer
               print(f"The distance needed to win has been set to {personalAnswer}.")
               break
+        elif editAnswer == "rounding":
+          if rounding_type == "down":
+            rounding_type = "up"
+            if input("Rounding has been set to up. Enter to continue: ").lower().strip() == "quit":
+              sys.exit()
+          else:
+            rounding_type = "down"
+            if input("Rounding has been set to down. Enter to continue: ").lower().strip() == "quit":
+              sys.exit()
         elif editAnswer == "quit":
           sys.exit()
-        else: # add other functions later
+        else: 
           print("That is not a command. See list for details:")
     else:
       print("That is invalid. Enter 'help' for commands.")
@@ -441,6 +452,7 @@ Enter a command to edit:
               print(f"Distance must be from 0 to {size_of_grid * 2}.")
             else:
               inputting = False
+
         else: # If it is the NPC's turn
           print("NPC turn:", end=" ")
           time.sleep(1)
@@ -449,14 +461,24 @@ Enter a command to edit:
           move = move.split(" ")
 
         # Find triple
+        if rounding_type == "up" and distance > 797: # Prevent from going up when its above the highest.
+          distance = 797
+        
         isFound = False
         for num in range(100): # The 100 here is to ensure a triple is picked.
           for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
-            if triple[2] == (distance - num): # This checks for the triple with the distance with subtracting every time it is looped.
-              a = triple[0] # if the triple is matching, save the a and b sides.
-              b = triple[1]
-              isFound = True # allows us to break from the second loop.
-              break
+            if rounding_type == "down": # If the type of rounding is down
+              if triple[2] == (distance - num): # This checks for the triple with the distance with subtracting every time it is looped.
+                a = triple[0] # if the triple is matching, save the a and b sides.
+                b = triple[1]
+                isFound = True # allows us to break from the second loop.
+                break
+            else: # If the type of rounding is up
+              if triple[2] == (distance + num): # This checks for the triple with the distance with adding every time it is looped.
+                a = triple[0] # if the triple is matching, save the a and b sides.
+                b = triple[1]
+                isFound = True # allows us to break from the second loop.
+                break
           if isFound == True: # only occurs if the triple is found
             break
         
