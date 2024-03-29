@@ -440,7 +440,7 @@ Enter a command to edit:
         pygame.quit()
         sys.exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
-        if npc_move == False or turn == 1:
+        if npc_mode == False or turn == 1:
           # Get move from player.
           inputting = True
           while inputting:
