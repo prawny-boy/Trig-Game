@@ -187,6 +187,18 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
     distance = size_of_grid * 2
   return str(distance) + " " + direction
 
+def print_settings(): # Prints the settings of the game out nicely.
+  print(f"""
+NPC:              {"Off" if npc_mode == False else "On"}, difficulty is {npc_difficulty}.
+Rounding:         Currently set to round {rounding_type}.
+Grid Size:        {size_of_grid} units.
+Player Size:      {player_size} pixels wide.
+Destination Size: {player_size} pixels wide.
+Colours:          Player one is {colour[0]}, player 2 is {colour[1]}, destination is {colour[2]}.
+Win Buffer:       Get {distance_to_win} units or nearer to the other player or destination to win.
+Turn Timeout:     {timeout} seconds.
+""")
+
 # testing functions
 # update_dicts()
 # print_stats(player_one)
@@ -205,6 +217,7 @@ npc_mode = False
 npc_difficulty = 3
 player_size = 3
 rounding_type = "down"
+timeout = 10
 
 # Main loop
 while True:
@@ -383,6 +396,10 @@ Enter a command to edit:
             rounding_type = "down"
             if input("Rounding has been set to down. Enter to continue: ").lower().strip() == "quit":
               sys.exit()
+        elif editAnswer == "print":
+          print_settings()
+          if input("Enter to Continue: ").strip().lower() == "quit":
+            sys.exit()
         elif editAnswer == "quit":
           sys.exit()
         else: 
