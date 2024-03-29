@@ -237,7 +237,7 @@ Enter a command to edit:
         elif editAnswer == "size.grid":
           sizeSelect = True
           while sizeSelect:
-            sizeAnswer = input("Select the size of the grid. (200 to 1000): ").strip()
+            sizeAnswer = input("Select the size of the grid. (100 to 800): ").strip()
             try:
               sizeAnswer = int(sizeAnswer)
             except:
@@ -276,6 +276,8 @@ Enter a command to edit:
                 break
               else:
                 print("That is not a valid colour. See pygame documentation for whole list of colours.")
+            if back:
+              break
         elif editAnswer == "quit":
           pygame.quit()
           sys.exit()

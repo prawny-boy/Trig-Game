@@ -57,6 +57,7 @@ Todo:
   finish menu commands
   time penalty of 10 sec, pick random instead
   make sure all inputs cannot be broken
+  print in colour
   write comments on every important line
   run import this
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)
