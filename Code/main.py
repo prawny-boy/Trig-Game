@@ -48,10 +48,10 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
   pygame.draw.line(app_surf, 'grey',(app_surf_rect.width/2, 0),(app_surf_rect.width/2,app_surf_rect.height),width=1)
   # draw destination
-  pygame.draw.circle(app_surf, destination['colour'], destination['pygame_current'], radius = 3, width = 3)
+  pygame.draw.circle(app_surf, destination['colour'], destination['pygame_current'], radius = player_size, width = player_size)
   # draw player one and player two
-  pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = 3, width = 2)
-  pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = 3, width = 2)
+  pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
+  pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
 
 def refresh_window(): # This refreshes the display
   pygame.display.update()
@@ -202,7 +202,8 @@ size_of_grid = 400
 colour = ["red", "blue", "black"]
 distance_to_win = 10
 npc_mode = False
-npc_difficulty = 1
+npc_difficulty = 3
+player_size = 3
 
 # Main loop
 while True:
@@ -218,10 +219,10 @@ while True:
       menu = False
     elif userInput == "help":
       print("""
-'help'  -> Displays all commands and what they do.
-'start' -> Starts a new round of the game.
-'rules' -> Prints the rules of the game.
-'quit'  -> Quits this program. This can be done at any time (any input) in the game.
+'help'     -> Displays all commands and what they do.
+'start'    -> Starts a new round of the game.
+'rules'    -> Prints the rules of the game.
+'quit'     -> Quits this program. This can be done at any time (any input) in the game.
 'settings' -> Shows some extra options to edit gameplay.
 """)
     elif userInput == "rules": # Instructions on the game.
@@ -255,12 +256,13 @@ RULES:
         print("""
 Enter a command to edit:
 'npc'         -> Toggles npc or no npc.
-'npc.level'   -> Selects the difficulty of the npc. It defaults to 1 (the easiest).
+'npc.level'   -> Selects the difficulty of the npc. It defaults to 3 (the hardest).
 'rounding'    -> Changes rounding to triple, up or down. (Not completed)
 'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random.
-'size.player' -> Changes the size of the players and destination. (Not completed)
+'size.player' -> Changes the size of the players and destination. Defaults to 3.
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
 'personal'    -> Changes the buffer to win if touching either player or destination. (Not completed)
+'time'        -> Changes the timeout for a player taking too long to move. Default is 10. (Not completed)
 'back'        -> Go back to previous page.
 """)
         editAnswer = input("Command: ").strip().lower()
@@ -277,7 +279,6 @@ Enter a command to edit:
                 pygame.quit()
                 sys.exit()
               elif sizeAnswer.lower() in ["back", ""]:
-                print("You have been sent back.")
                 break
               else:
                 print("Has to be a whole number. Try Again.")
@@ -335,6 +336,27 @@ Enter a command to edit:
               break
             else:
               print("Must be a number from 1 to 3.")
+        elif editAnswer == "size.player":
+          while True:
+            sizePlayerAnswer = input("Select the size of the players and destination. (3 to 20): ").strip()
+            try:
+              sizePlayerAnswer = int(sizePlayerAnswer)
+            except:
+              if sizePlayerAnswer.lower() == "quit":
+                pygame.quit()
+                sys.exit()
+              elif sizePlayerAnswer.lower() in ["back", ""]:
+                break
+              else:
+                print("Has to be a whole number. Try Again.")
+                continue
+
+            if sizePlayerAnswer > 20 or sizePlayerAnswer < 3:
+              print("From 3 to 20. Try again.")
+            else:
+              player_size = sizePlayerAnswer
+              print(f"Size of players and destination has been set to {str(sizePlayerAnswer)}.")
+              break
         elif editAnswer == "quit":
           pygame.quit()
           sys.exit()
