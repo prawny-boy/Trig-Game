@@ -114,6 +114,11 @@ def update_dicts():
   player_one["personal"] = distance_to_win # sets the distance of the personal space buffer
   player_two["personal"] = distance_to_win # sets the distance of the personal space buffer
   destination["personal"] = distance_to_win # sets the distance of the personal space buffer
+  # Update name of player_two
+  if npc_mode:
+    player_two["name"] = "npc"
+  else:
+    player_two["name"] = "two"
 
 def reset_dicts():
   # reset current coordinates
@@ -156,8 +161,6 @@ def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordi
     player_one["current"] = [player_one["current"][0] + x_add, player_one["current"][1] + y_add]
   elif player_num == 2:
     player_two["current"] = [player_two["current"][0] + x_add, player_two["current"][1] + y_add]
-  elif player_num == 3: # NPC update as player 3
-    pass
 
 def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_x) -> str: # calculates the move for the npc and returns str in the format distance<space>direction.
   # difficulty code
@@ -173,14 +176,14 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
   # actual movement (direction)
   if gradient >= 0: # Means quadrant 1 or 3
     if gradient >= 1: # Means direction 2 or 6
-      direction = "6" if npc_x < destination_x else "2"
+      direction = "2" if npc_x < destination_x else "6"
     else: # Means direction 1 or 5
-      direction = "5" if npc_x < destination_x else "1"
+      direction = "1" if npc_x < destination_x else "5"
   else: # Means quadrant 4 or 2
     if gradient <= -1: # Means direction 7 or 3
-      direction = "3" if npc_x < destination_x else "7"
+      direction = "7" if npc_x < destination_x else "3"
     else: # Means direction 8 or 4
-      direction = "4" if npc_x < destination_x else "8"
+      direction = "8" if npc_x < destination_x else "4"
   # actual movement (distance)
   distance = round(distance)
   if distance > size_of_grid * 2:
@@ -472,13 +475,16 @@ Enter a command to edit:
 
         else: # If it is the NPC's turn
           print("NPC turn:", end=" ")
+          update_dicts()
           move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
           for char in move:
             print(char, end="")
             sys.stdout.flush()
-            time.sleep(random.random() / 3)
+            time.sleep(random.random() / 2)
           print("")
           move = move.split(" ")
+          distance = int(move[0])
+          direction = int(move[1])
 
         # Find triple
         if rounding_type == "up" and distance > 797: # Prevent from going up when its above the highest.
@@ -501,7 +507,7 @@ Enter a command to edit:
                 break
           if isFound == True: # only occurs if the triple is found
             break
-        
+
         # Use direction to move to a coordinate.
         if direction % 2 == 0: # if the direction is even, flip a and b.
           a, b = b, a # flips the variables so a=b and b=a
@@ -546,7 +552,7 @@ Enter a command to edit:
         if destinationWin: # Win by getting near destination
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            lastInput = input("Player 1 won because they ended up near the destination! Enter to go back to menu.")
+            lastInput = input("Player 1 won because they ended up near the destination! Enter to go back to menu. ")
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
@@ -555,7 +561,7 @@ Enter a command to edit:
               break
           elif turn == 2:
             print_stats(player_one)
-            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu.")
+            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ")
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
