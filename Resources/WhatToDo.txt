@@ -50,7 +50,13 @@ More:
   Use functions, no import except numpy, random and time
   NPC can be added for more marks
 
-
-Commit:
-  Removed the space buffer calculation as it is not needed to check if the player is 10 or less units from the destination or other player.
-  Changed the personal in dictionaries to become a integer which is the distance of the buffer.
+Todo:
+  need to print destination stats after each player moves
+  design algorithm for npc
+  implement npc
+  finish menu commands
+  time penalty of 10 sec, pick random instead
+  make sure all inputs cannot be broken
+  write comments on every important line
+  run import this
+  make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)
