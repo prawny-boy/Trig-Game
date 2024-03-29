@@ -47,7 +47,7 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
   pygame.draw.line(app_surf, 'grey',(app_surf_rect.width/2, 0),(app_surf_rect.width/2,app_surf_rect.height),width=1)
   # draw destination
-  pygame.draw.circle(app_surf, 'black', destination['pygame_current'], radius = 3, width = 3)
+  pygame.draw.circle(app_surf, destination['colour'], destination['pygame_current'], radius = 3, width = 3)
   # draw player one and player two
   pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = 3, width = 2)
   pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = 3, width = 2)
@@ -185,12 +185,11 @@ while True:
       menu = False
     elif userInput == "help":
       print("""
-'help' -> Displays all commands and what they do.
+'help'  -> Displays all commands and what they do.
 'start' -> Starts a new round of the game.
 'rules' -> Prints the rules of the game.
-'quit' -> Quits this program. This can be done at any time (any input) in the game.
-'npc' -> adds a npc with a certain difficulty. You are also able to select 3 player or 2 player mode with this.
-'extra' -> Shows some extra options to edit gameplay.
+'quit'  -> Quits this program. This can be done at any time (any input) in the game.
+'settings' -> Shows some extra options to edit gameplay.
 """)
     elif userInput == "rules": # Instructions on the game.
       print("""
@@ -217,22 +216,25 @@ RULES:
       print("Bye!\n")
       pygame.quit()
       sys.exit()
-    elif userInput == "npc":
-      print("That has not been completed yet. Please try again in later versions.")
-    elif userInput == "extra":
+    elif userInput == "settings":
       extraRunning = True
       while extraRunning:
         print("""
 Enter a command to edit:
-'rounding' -> Not completed
-'size' -> changes the size of the grid. This also changes the player coords to be random.
-'colours' -> Not completed
-'back' -> Go back
+'npc'         -> Toggles npc or no npc. (Not completed)
+'npc.player'  -> Selects if the npc will make 3 player mode or just 2 player mode. Defaults to 2 player mode. (Not completed)
+'npc.level'   -> Selects the difficulty of the npc. (Not completed)
+'rounding'    -> Changes rounding to triple, up or down. (Not completed)
+'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random.
+'size.player' -> Changes the size of the players and destination. (Not completed)
+'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
+'personal'    -> Changes the buffer to win if touching either player or destination. (Not completed)
+'back'        -> Go back to previous page.
 """)
         editAnswer = input("Command: ").strip().lower()
         if editAnswer == "back":
           break
-        elif editAnswer == "size":
+        elif editAnswer == "size.grid":
           sizeSelect = True
           while sizeSelect:
             sizeAnswer = input("Select the size of the grid. (200 to 1000): ").strip()
@@ -249,8 +251,8 @@ Enter a command to edit:
                 print("Has to be a whole number. Try Again.")
                 continue
 
-            if sizeAnswer > 1000 or sizeAnswer < 200:
-              print("From 200 to 1000. Try again.")
+            if sizeAnswer > 800 or sizeAnswer < 100:
+              print("From 100 to 800. Try again.")
             else:
               size_of_grid = round(sizeAnswer/2)
               # Reset coordinates
@@ -258,7 +260,22 @@ Enter a command to edit:
 
               print(f"Size of grid has been set to {str(sizeAnswer)}.")
               break
-
+        elif editAnswer == "colour":
+          back = False
+          for i in range(3): # change to 4 after implementing npc.
+            while True:
+              colourSelect = input(f"Select a colour for {"player 1" if i == 0 else ("player 2" if i == 1 else "destination")}: ").strip().lower()
+              if colourSelect in pygame.color.THECOLORS.keys(): # Checks if it is a real colour
+                print(f"Colour {colourSelect} selected.")
+                colour[i] = colourSelect
+                break
+              elif colourSelect == "quit":
+                sys.exit()
+              elif colourSelect in ["back", ""]:
+                back = True
+                break
+              else:
+                print("That is not a valid colour. See pygame documentation for whole list of colours.")
         elif editAnswer == "quit":
           pygame.quit()
           sys.exit()
@@ -269,12 +286,16 @@ Enter a command to edit:
   
   # After the menu, this is the game code.
   print("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)") # print out some early texts to show players.
-  print("""Player 1, you are red. 
-Player 2, you are blue.""")
+  print(f"""Player 1, you are {colour[0]}. 
+Player 2, you are {colour[1]}.""")
   print("Click the screen to start the game.") # tells players to click the screen
 
   # restart. this is for resetting the dictionaries
   reset_dicts()
+
+  # testing variables
+  # print(colour)
+  # print(player_one["colour"])
 
   # Initalise pygame display
   app_surf, app_surf_rect = create_app_window(size_of_grid*2,size_of_grid*2)
