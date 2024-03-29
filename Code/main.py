@@ -122,14 +122,16 @@ def reset_dicts():
   # For others
   update_dicts()
 
-def print_stats(player_dict:dict): # prints the stats; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
+def print_stats(player_dict:dict, destination_dict:bool = None): # prints the stats; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
   print(f"""
 PLAYER {player_dict["name"].upper()} STATS:
 Location: ({player_dict["current"][0]}, {player_dict["current"][1]})
 Midpoint with player {"two" if player_dict["name"] == "one" else "one"}: ({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})
 Distance to destination: {player_dict["distance"]} units
-Gradient with destination: {player_dict["gradient"]}
-""")
+Gradient with destination: {player_dict["gradient"]}""")
+  if destination_dict != None:
+    print(f"Destination Location: {destination_dict["current"][0]}, {destination_dict["current"][1]}.")
+  print("")
 
 def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
   if player_dict["distance"] <= player_dict["personal"]:
@@ -385,13 +387,13 @@ Player 2, you are {colour[1]}.""")
         destinationWin = False
         playerWin = False
         if turn == 1: # prints the stats of the player.
-          print_stats(player_one)
+          print_stats(player_one, destination)
           destinationWin = check_destination_win(player_one) # Check if the player won.
           playerWin = check_player_win(player_one, player_two)
         elif turn == 2:
-          print_stats(player_two)
-          destinationWin = check_destination_win(player_one) # Check if the player won.
-          playerWin = check_player_win(player_one, player_two)
+          print_stats(player_two, destination)
+          destinationWin = check_destination_win(player_two) # Check if the player won.
+          playerWin = check_player_win(player_two, player_one)
         elif turn == 3: # for npc
           pass
 

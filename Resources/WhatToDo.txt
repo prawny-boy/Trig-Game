@@ -51,7 +51,6 @@ More:
   NPC can be added for more marks
 
 Todo:
-  need to print destination stats after each player moves
   design algorithm for npc
   implement npc
   finish menu commands
