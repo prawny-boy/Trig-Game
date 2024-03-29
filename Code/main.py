@@ -183,8 +183,8 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
       direction = "4" if npc_x < destination_x else "8"
   # actual movement (distance)
   distance = round(distance)
-  if distance > 800:
-    distance = 800
+  if distance > size_of_grid * 2:
+    distance = size_of_grid * 2
   return str(distance) + " " + direction
 
 # testing functions
@@ -401,8 +401,8 @@ Enter a command to edit:
               print("The distance was less than 5. Please re-enter.")
             elif direction > 8 or direction < 1:
               print("The direction must be 1-8. Read rules for more details.")
-            elif distance > size_of_grid*2 or distance < 0:
-              print(f"Distance must be from 0 to {size_of_grid*2}.")
+            elif distance > size_of_grid * 2 or distance < 0:
+              print(f"Distance must be from 0 to {size_of_grid * 2}.")
             else:
               inputting = False
         else: # If it is the NPC's turn
