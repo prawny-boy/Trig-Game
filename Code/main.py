@@ -251,8 +251,7 @@ RULES:
       pygame.quit()
       sys.exit()
     elif userInput == "settings":
-      extraRunning = True
-      while extraRunning:
+      while True:
         print("""
 Enter a command to edit:
 'npc'         -> Toggles npc or no npc.
@@ -261,7 +260,7 @@ Enter a command to edit:
 'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random.
 'size.player' -> Changes the size of the players and destination. Defaults to 3.
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
-'personal'    -> Changes the buffer to win if touching either player or destination. (Not completed)
+'personal'    -> Changes the buffer to win if near either player or destination.
 'time'        -> Changes the timeout for a player taking too long to move. Default is 10. (Not completed)
 'back'        -> Go back to previous page.
 """)
@@ -276,7 +275,6 @@ Enter a command to edit:
               sizeAnswer = int(sizeAnswer)
             except:
               if sizeAnswer.lower() == "quit":
-                pygame.quit()
                 sys.exit()
               elif sizeAnswer.lower() in ["back", ""]:
                 break
@@ -287,10 +285,7 @@ Enter a command to edit:
             if sizeAnswer > 800 or sizeAnswer < 100:
               print("From 100 to 800. Try again.")
             else:
-              size_of_grid = round(sizeAnswer/2)
-              # Reset coordinates
-              reset_dicts()
-
+              size_of_grid = round(sizeAnswer / 2)
               print(f"Size of grid has been set to {str(sizeAnswer)}.")
               break
         elif editAnswer == "colour":
@@ -343,7 +338,6 @@ Enter a command to edit:
               sizePlayerAnswer = int(sizePlayerAnswer)
             except:
               if sizePlayerAnswer.lower() == "quit":
-                pygame.quit()
                 sys.exit()
               elif sizePlayerAnswer.lower() in ["back", ""]:
                 break
@@ -357,8 +351,28 @@ Enter a command to edit:
               player_size = sizePlayerAnswer
               print(f"Size of players and destination has been set to {str(sizePlayerAnswer)}.")
               break
+        elif editAnswer == "personal":
+          while True:
+            personalAnswer = input("Select the distance from the destination that you need to get to win. (0 to 100): ").strip()
+            try:
+              personalAnswer = int(personalAnswer)
+            except:
+              if personalAnswer.lower() == "quit":
+                pygame.quit()
+                sys.exit()
+              elif personalAnswer.lower() in ["back", ""]:
+                break
+              else:
+                print("Has to be a whole number. Try Again.")
+                continue
+
+            if personalAnswer > 100 or personalAnswer < 0:
+              print("From 0 to 100. Try again.")
+            else:
+              distance_to_win = personalAnswer
+              print(f"The distance needed to win has been set to {personalAnswer}.")
+              break
         elif editAnswer == "quit":
-          pygame.quit()
           sys.exit()
         else: # add other functions later
           print("That is not a command. See list for details:")
@@ -382,7 +396,7 @@ Enter a command to edit:
   # print(player_one["colour"])
 
   # Initalise pygame display
-  app_surf, app_surf_rect = create_app_window(size_of_grid*2,size_of_grid*2)
+  app_surf, app_surf_rect = create_app_window(size_of_grid * 2,size_of_grid * 2)
   make_pygame_coords()
   app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
   refresh_window()
