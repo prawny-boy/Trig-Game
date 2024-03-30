@@ -488,7 +488,7 @@ Enter a command to edit:
             t = threading.Thread(target=input_with_timeout, args=(f"Player {turn}! Make your move: ", timeout, q))
             t.start()
             try:
-              move = q.get(timeout=10)
+              move = q.get(timeout=timeout)
             except queue.Empty:
               print("\nTimes up. Picking random triple.")
               move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
