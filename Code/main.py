@@ -190,16 +190,19 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
   if randomised == True:
     return str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
   # actual movement (direction)
-  if gradient >= 0: # Means quadrant 1 or 3
-    if gradient >= 1: # Means direction 2 or 6
-      direction = "2" if npc_x < destination_x else "6"
-    else: # Means direction 1 or 5
-      direction = "1" if npc_x < destination_x else "5"
-  else: # Means quadrant 4 or 2
-    if gradient <= -1: # Means direction 7 or 3
-      direction = "7" if npc_x < destination_x else "3"
-    else: # Means direction 8 or 4
-      direction = "8" if npc_x < destination_x else "4"
+  try:
+    if gradient >= 0: # Means quadrant 1 or 3
+      if gradient >= 1: # Means direction 2 or 6
+        direction = "2" if npc_x < destination_x else "6"
+      else: # Means direction 1 or 5
+        direction = "1" if npc_x < destination_x else "5"
+    else: # Means quadrant 4 or 2
+      if gradient <= -1: # Means direction 7 or 3
+        direction = "7" if npc_x < destination_x else "3"
+      else: # Means direction 8 or 4
+        direction = "8" if npc_x < destination_x else "4"
+  except: # Gradient is undefined
+    gradient = "3"
   # actual movement (distance)
   distance = round(distance)
   if distance > size_of_grid * 2:
