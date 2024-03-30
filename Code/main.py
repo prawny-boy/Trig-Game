@@ -268,8 +268,7 @@ RULES:
   -> Or, move your player into another player's personal space of 10 units wide.
 3. TURNS
   -> Each player will take turns to move, with player 1 starting first.
-  -> A NPC can also be added in the menu at a certain difficulty if wanted, by using "npc".
-  -> This NPC can either be selected as a third player or a second player to play with by yourself.
+  -> A NPC can also be added in the menu at a certain difficulty if wanted, by using "npc" then "npc.level" in settings.
 4. MOVEMENT
   -> You can only move along the hypothenuse of a pythagorean triple.
   -> You will move by inputting a distance and a direction in the format 'distance<space>direction'
@@ -600,7 +599,7 @@ Enter a command to edit:
         if destinationWin: # Win by getting near destination
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            lastInput = input("Player 1 won because they ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
+            lastInput = input(colored("Player 1 won because they ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
@@ -609,7 +608,7 @@ Enter a command to edit:
               break
           elif turn == 2:
             print_stats(player_one)
-            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
+            lastInput = input(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
@@ -619,7 +618,7 @@ Enter a command to edit:
         elif playerWin: # Win by getting near player
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            lastInput = input(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
+            lastInput = input(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
@@ -628,7 +627,7 @@ Enter a command to edit:
               break
           elif turn == 2:
             print_stats(player_one)
-            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
+            lastInput = input(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
