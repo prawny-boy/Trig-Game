@@ -202,7 +202,7 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
       else: # Means direction 8 or 4
         direction = "8" if npc_x < destination_x else "4"
   except: # Gradient is undefined
-    gradient = "3"
+    direction = "3"
   # actual movement (distance)
   distance = round(distance)
   if distance > size_of_grid * 2:
@@ -458,12 +458,8 @@ Enter a command to edit:
     cprint(f"Player 2, you are {colour[1]}.", pcolour[1])
   cprint("Click the screen to start the game.", attrs=["bold"]) # tells players to click the screen
 
-  # restart. this is for resetting the dictionaries
+  # Restart. this is for resetting the dictionaries
   reset_dicts()
-
-  # testing variables
-  # print(colour)
-  # print(player_one["colour"])
 
   # Initalise pygame display
   app_surf, app_surf_rect = create_app_window(size_of_grid * 2,size_of_grid * 2)
