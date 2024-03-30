@@ -1,7 +1,7 @@
 # imports
-import random, time, sys, pygame, msvcrt
+import random, time, sys, pygame
 from timeout_input import *
-from termcolor import cprint
+from termcolor import cprint, colored
 from triples_list import *
 
 # define dictionaries
@@ -208,17 +208,17 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
     distance = size_of_grid * 2
   return str(distance) + " " + direction
 
-def print_settings(): # Prints the settings of the game out nicely.
-  print(f"""
-NPC:              {"Off" if npc_mode == False else "On"}, difficulty is {npc_difficulty}.
-Rounding:         Currently set to round {rounding_type}.
-Grid Size:        {size_of_grid} units.
-Player Size:      {player_size} pixels wide.
-Destination Size: {player_size} pixels wide.
-Colours:          Player one is {colour[0]}, player 2 is {colour[1]}, destination is {colour[2]}.
-Win Buffer:       Get {distance_to_win} units or nearer to the other player or destination to win.
-Turn Timeout:     {timeout} seconds.
-""")
+def print_settings(): # Prints the settings of the game out nicely with colour.
+  print("")
+  print(f"NPC:              {colored("Off", "red", attrs=["bold"]) if npc_mode == False else colored("On", "green", attrs=["bold"])}, difficulty is {colored(npc_difficulty, "green", attrs=["bold"]) if npc_difficulty == 1 else (colored(npc_difficulty, "yellow", attrs=["bold"]) if npc_difficulty == 2 else colored(npc_difficulty, "red", attrs=["bold"]))}.")
+  print(f"Rounding:         Currently set to round {colored(rounding_type, "red", attrs=["bold"]) if rounding_type == "down" else colored(rounding_type, "green", attrs=["bold"])}.")
+  print(f"Grid Size:        {colored(size_of_grid, attrs=["bold", "underline"])} units.")
+  print(f"Player Size:      {colored(player_size, attrs=["bold", "underline"])} pixels wide.")
+  print(f"Destination Size: {colored(player_size, attrs=["bold", "underline"])} pixels wide.")
+  print(f"Colours:          Player one is {colored(colour[0], print_colours[colour[0]])}, {"player 2" if npc_mode == False else "NPC"} is {colored(colour[1], print_colours[colour[1]])}, destination is {colored(colour[2], print_colours[colour[2]])}.")
+  print(f"Win Buffer:       Get {colored(distance_to_win, attrs=["bold", "underline"])} units or nearer to the other player or destination to win.")
+  print(f"Turn Timeout:     {colored(timeout, attrs=["bold", "underline"])} seconds.")
+  print("")
 
 # testing functions
 # update_dicts()
@@ -227,7 +227,9 @@ Turn Timeout:     {timeout} seconds.
 # update_coords(100, 0, 1)
   
 # ----------------- MAIN CODE -----------------
-print("Hello, welcome to this math game by Sean Chan!")
+print("----------------------------------------------")
+cprint("Hello, welcome to this math game by Sean Chan!", "white", attrs=["bold"])
+print("----------------------------------------------")
 
 # Initalise some default settings
 size_of_grid = 400
@@ -250,16 +252,15 @@ while True:
   while menu:
     userInput = input("Enter 'start' to start the game. Enter 'help' for additional commands: ").lower().strip() # inputs a command, removing spaces and making it lowercase.
     if userInput == "start": # checks what command it is a does it.
-      print("Have fun! Starting...")
       menu = False
     elif userInput == "help":
-      print("""
+      cprint("""
 'help'     -> Displays all commands and what they do.
 'start'    -> Starts a new round of the game.
 'rules'    -> Prints the rules of the game.
 'quit'     -> Quits this program. This can be done at any time (any input) in the game.
 'settings' -> Shows some extra options to edit gameplay.
-""")
+""", "dark_grey")
     elif userInput == "rules": # Instructions on the game.
       print("""
 RULES:
@@ -286,7 +287,7 @@ RULES:
       sys.exit()
     elif userInput == "settings":
       while True:
-        print("""
+        cprint("""
 Enter a command to edit:
 'npc'         -> Toggles npc or no npc. Default is no npc.
 'npc.level'   -> Selects the difficulty of the npc. Default is 3. (the hardest)
@@ -295,10 +296,10 @@ Enter a command to edit:
 'size.player' -> Changes the size of the players and destination. Default is 3 pixels.
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
 'personal'    -> Changes the buffer to win if near either player or destination. Default is 10 units.
-'time'        -> Changes the timeout for a player taking too long to move. This can be turned off. Default is 10 seconds. (Not completed)
-'print'       -> Prints the current settings. (Not completed)
+'time'        -> Changes the timeout for a player taking too long to move. Default is 10 seconds.
+'print'       -> Prints the current settings.
 'back'        -> Go back to previous page.
-""")
+""", "dark_grey")
         editAnswer = input("Command: ").strip().lower()
         if editAnswer == "back":
           break
@@ -314,14 +315,14 @@ Enter a command to edit:
               elif sizeAnswer.lower() in ["back", ""]:
                 break
               else:
-                print("Has to be a whole number. Try Again.")
+                cprint("Has to be a whole number. Try Again.", "red", attrs=["underline"])
                 continue
 
             if sizeAnswer > 800 or sizeAnswer < 100:
-              print("From 100 to 800. Try again.")
+              cprint("From 100 to 800. Try again.", "red", attrs=["underline"])
             else:
               size_of_grid = round(sizeAnswer / 2)
-              print(f"Size of grid has been set to {str(sizeAnswer)}.")
+              cprint(f"Size of grid has been set to {str(sizeAnswer)}.", "green", attrs=["bold"])
               break
         elif editAnswer == "colour":
           back = False
@@ -329,7 +330,7 @@ Enter a command to edit:
             while True:
               colourSelect = input(f"Select a colour for {"player 1" if i == 0 else ("player 2" if i == 1 else "destination")}: ").strip().lower()
               if colourSelect in print_colours.keys(): # Checks if it is a real colour.
-                print(f"Colour {colourSelect} selected.")
+                cprint(f"Colour {colourSelect} selected.", print_colours[colourSelect], attrs=["bold"])
                 colour[i] = colourSelect
                 break
               elif colourSelect == "list":
@@ -343,18 +344,18 @@ Enter a command to edit:
                 back = True
                 break
               else:
-                print("That is not a valid colour. Enter 'list' for a list of avaliable colours.")
+                cprint("That is not a valid colour. Enter 'list' for a list of avaliable colours.", "red", attrs=["underline"])
             if back:
               break
           pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # refresh the pcolor variable to sync with the colour variable
         elif editAnswer == "npc":
           if npc_mode == False:
             npc_mode = True
-            if input("NPC mode has been turned on. Enter to continue: ").lower().strip() == "quit":
+            if input(colored("NPC mode has been turned on. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
           else:
             npc_mode = False
-            if input("NPC mode has been turned off. Enter to continue: ").lower().strip() == "quit":
+            if input(colored("NPC mode has been turned off. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
         elif editAnswer == "npc.level":
           while True:
@@ -364,14 +365,14 @@ Enter a command to edit:
             try:
               levelSelect = int(levelSelect)
             except:
-              print("Must be a number.")
+              cprint("Must be a number.", "red", attrs=["underline"])
               continue
             if levelSelect >= 1 and levelSelect <= 3:
-              print(f"Successfully selected difficulty to be {levelSelect}.")
+              cprint(f"Successfully selected difficulty to be {levelSelect}.", "green", attrs=["bold"])
               npc_difficulty = levelSelect
               break
             else:
-              print("Must be a number from 1 to 3.")
+              print("Must be a number from 1 to 3.", "red", attrs=["underline"])
         elif editAnswer == "size.player":
           while True:
             sizePlayerAnswer = input("Select the size of the players and destination. (3 to 20): ").strip()
@@ -383,14 +384,14 @@ Enter a command to edit:
               elif sizePlayerAnswer.lower() in ["back", ""]:
                 break
               else:
-                print("Has to be a whole number. Try Again.")
+                cprint("Has to be a whole number. Try Again.", "red", attrs=["underline"])
                 continue
 
             if sizePlayerAnswer > 20 or sizePlayerAnswer < 3:
-              print("From 3 to 20. Try again.")
+              cprint("From 3 to 20. Try again.", "red", attrs=["underline"])
             else:
               player_size = sizePlayerAnswer
-              print(f"Size of players and destination has been set to {str(sizePlayerAnswer)}.")
+              cprint(f"Size of players and destination has been set to {str(sizePlayerAnswer)}.", "green", attrs=["bold"])
               break
         elif editAnswer == "personal":
           while True:
@@ -404,14 +405,14 @@ Enter a command to edit:
               elif personalAnswer.lower() in ["back", ""]:
                 break
               else:
-                print("Has to be a whole number. Try Again.")
+                cprint("Has to be a whole number. Try Again.", "red", attrs=["underline"])
                 continue
 
             if personalAnswer > 100 or personalAnswer < 0:
-              print("From 0 to 100. Try again.")
+              cprint("From 0 to 100. Try again.", "red", attrs=["underline"])
             else:
               distance_to_win = personalAnswer
-              print(f"The distance needed to win has been set to {personalAnswer}.")
+              cprint(f"The distance needed to win has been set to {personalAnswer}.", "green", attrs=["bold"])
               break
         elif editAnswer == "rounding":
           if rounding_type == "down":
@@ -424,14 +425,35 @@ Enter a command to edit:
               sys.exit()
         elif editAnswer == "print":
           print_settings()
-          if input("Enter to Continue: ").strip().lower() == "quit":
+          if input(colored("Enter to continue: ", "green", attrs=["bold"])).strip().lower() == "quit":
             sys.exit()
+        elif editAnswer == "time":
+          while True:
+            timeAnswer = input("Select the timeout for moving. (1 to 100 seconds): ").strip()
+            try:
+              timeAnswer = int(timeAnswer)
+            except:
+              if timeAnswer.lower() == "quit":
+                sys.exit()
+              elif timeAnswer.lower() in ["back", ""]:
+                break
+              else:
+                cprint("Has to be a whole number. Try Again.", "red", attrs=["underline"])
+                continue
+
+            if timeAnswer > 100 or timeAnswer < 1:
+              cprint("From 1 to 100. Try again.", "red", attrs=["underline"])
+            else:
+              timeout = timeAnswer
+              cprint(f"Timeout for making a move has been set to {str(timeAnswer)}.", "green", attrs=["bold"])
+              break
         elif editAnswer == "quit":
           sys.exit()
         else: 
-          print("That is not a command. See list for details:")
+          cprint("That is not a command. See list for details:", "red", attrs=["underline"])
     else:
-      print("That is invalid. Enter 'help' for commands.")
+      cprint("That is invalid. Enter 'help' for commands.", "red", attrs=["underline"])
+      print("------------------------------------------------------------------------")
   
   # After the menu, this is the game code.
   cprint("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)", "white", attrs=["bold"]) # print out some early texts to show players.
