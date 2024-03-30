@@ -484,10 +484,12 @@ Enter a command to edit:
           inputting = True
           while inputting: # Handles user error
 
+            q = queue.Queue()
+            t = threading.Thread(target=input_with_timeout, args=(f"Player {turn}! Make your move: ", timeout, q))
+            t.start()
             try:
-              move = input_with_timeout(f"Player {turn}! Make your move: ", timeout) # Timeout for input
-              print("")
-            except TimeoutExpired:
+              move = q.get(timeout=10)
+            except queue.Empty:
               print("\nTimes up. Picking random triple.")
               move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
               print(f"Selected: {move}")
