@@ -1,39 +1,42 @@
-# imports
-import random, time, sys, pygame
-from timeout_input import *
-from termcolor import cprint, colored
-from triples_list import *
+# Imports
+import random, time, sys, pygame # Imports needed libraries. 
+# Random for selecting random coords and a way to calculate the npc move. 
+# Time for making npc typing feel more realistic and timeout of inputs.
+# Sys for system exit and timed input because it needs to be printed using sys.stdout.write().
+# Pygame for visual depiction of display.
+from timeout_input import * # Imports the function to have timed input from a different file.
+from termcolor import cprint, colored # Imports the module functions that prints in colour.
+from triples_list import * # Imports the triple_list.
 
 # define dictionaries
-player_one = {
+player_one = { # Player_one dictionary (initialise, so all is set to 0 or none)
   "name": "one", # only used for printing the stats
   "current": [0, 0], # sets current to origin for now
-  "pygame_current": None,
+  "pygame_current": None, # Pygame coords of the player
+  "colour": None, # Colour of the player to make it changeable
+  "distance": 0.0, # Distance from destination
+  "gradient": 0.0, # The gradient of the player from the destination
+  "midpoint": [0, 0], # The midpoint between this player and the other player
+  "personal": 0 # 0 for now, personal space buffer distance
+}
+player_two = { # Player 2 dictionary. This dictionary can act as the npc when in npc mode.
+  "name": "two", 
+  "current": [0, 0], 
+  "pygame_current": None, 
   "colour": None,
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
-  "personal": 0 # 0 for now
+  "personal": 0 
 }
-player_two = { # This dictionary can act as the npc when in npc mode.
-  "name": "two", # only used for printing the stats
-  "current": [0, 0], # sets current to origin for now
+destination = { # Destination dictionary.
+  "current": [0, 0], 
   "pygame_current": None,
   "colour": None,
-  "distance": 0.0,
-  "gradient": 0.0,
-  "midpoint": [0, 0],
-  "personal": 0 # 0 for now
+  "personal": 0 
 }
 
-destination = {
-  "current": [0, 0], # sets current to origin for now
-  "pygame_current": None,
-  "colour": None,
-  "personal": 0 # 0 for now
-}
-
-print_colours = { # right is print colours, left is pygame colours that correspond to them.
+print_colours = { # right is print colours, left is pygame colours that correspond to them. This is for printing in colours so that it corresponds to the actual display colours.
   "black": "dark_grey",
   "red": "red",
   "green": "green",
@@ -45,37 +48,37 @@ print_colours = { # right is print colours, left is pygame colours that correspo
 }
 
 # Pygame fuctions
-pygame.init()
-app_clock = pygame.time.Clock()
+pygame.init() # Initialise pygame
+app_clock = pygame.time.Clock() # Defines the clock (for pygame display)
 
-def create_app_window(width:int, height:int): # Creates app window, input with two int.
-  pygame.display.set_caption("Game")
-  app_dimensions = (width + 10, height + 10)
-  app_surf = pygame.display.set_mode(app_dimensions)
-  app_surf_rect = app_surf.get_rect()
-  return app_surf, app_surf_rect
+def create_app_window(width:int, height:int): # Creates app window of the pygame display. Takes two integers and returns the application surface and rectangle.
+  pygame.display.set_caption("Game") # Sets the caption of the game
+  app_dimensions = (width + 10, height + 10) # Sets the dimensions
+  app_surf = pygame.display.set_mode(app_dimensions) # Sets the app surface size to the dimensions
+  app_surf_rect = app_surf.get_rect() # Gets the rectangle of the app surface.
+  return app_surf, app_surf_rect # Returns the app surface and rectangle.
 
-def app_surf_update(destination, player_one, player_two): # draws plane and players
+def app_surf_update(destination, player_one, player_two): # draws plane and players as dot on the visual display with a white background.
   app_surf.fill("white") # Fill the display surface with white background.
   # draw the x and y axis
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
-  pygame.draw.line(app_surf, 'grey',(app_surf_rect.width/2, 0),(app_surf_rect.width/2,app_surf_rect.height),width=1)
+  pygame.draw.line(app_surf, 'grey',(app_surf_rect.width / 2, 0),(app_surf_rect.width / 2, app_surf_rect.height), width = 1)
   # draw destination
   pygame.draw.circle(app_surf, destination['colour'], destination['pygame_current'], radius = player_size, width = player_size)
-  # draw player one and player two
+  # draw player one and player two as circles
   pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
   pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
 
-def refresh_window(): # This refreshes the display
+def refresh_window(): # This refreshes the display every 30 ticks
   pygame.display.update()
   app_clock.tick(30)
 
-def conv_cartesian_to_pygame_coords(x, y):
+def conv_cartesian_to_pygame_coords(x, y): # Converts normal coords to pygame coords because pygame's 0,0 is in the top left corner.
   pygame_x = x + app_surf_rect.width / 2
   pygame_y = -y + app_surf_rect.height / 2
   return(pygame_x, pygame_y)
 
-def make_pygame_coords():
+def make_pygame_coords(): # Updates the pygame coords for each entity using their current coordinates.
   player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
   player_two['pygame_current'] = conv_cartesian_to_pygame_coords(player_two['current'][0], player_two['current'][1])
   destination['pygame_current'] = conv_cartesian_to_pygame_coords(destination['current'][0], destination['current'][1])
@@ -110,7 +113,7 @@ def calculate_gradient(point1:list, point2:list) -> float: # Gets two points and
     gradient = "undefined"
     return gradient # returns the undefined value.
 
-def update_dicts():
+def update_dicts(): # Updates the dictionaries of each entity.
   # player 1 update
   player_one["distance"] = calculate_distance(destination["current"], player_one["current"])
   player_one["gradient"] = calculate_gradient(destination["current"], player_one["current"])
@@ -133,12 +136,12 @@ def update_dicts():
   else:
     player_two["name"] = "two"
 
-def reset_dicts():
+def reset_dicts(): # resets every entities' coordinates to random. and then updates the other parts, like distance using the new coordinates
   # reset current coordinates
   player_one["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
   player_two["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
   destination["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
-  # For others
+  # For others, like gradient and distance
   update_dicts()
 
 def print_stats(player_dict:dict, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
@@ -169,12 +172,7 @@ def check_player_win(player_dict:dict, other_player_dict:dict) -> bool: # Gets a
   else:
     return False
 
-def draw_plane(): # redraws the cartesian plane with player points on top. 
-  x_size = 1600 # size of the grid, -800 to 800
-  y_size = 1600 # size of the grid, -800 to 800
-  # something here to print cartesian plane. Pygame?
-
-def update_coords(x_add:int, y_add:int, player_num:int): # Translates the coordinates in a certain amount of x and certain amount of y.
+def translate_coords(x_add:int, y_add:int, player_num:int): # Translates the coordinates in a certain amount of x and certain amount of y.
   if player_num == 1:
     player_one["current"] = [player_one["current"][0] + x_add, player_one["current"][1] + y_add]
   elif player_num == 2:
@@ -219,41 +217,35 @@ def print_settings(): # Prints the settings of the game out nicely with colour.
   print(f"Win Buffer:       Get {colored(distance_to_win, attrs=["bold", "underline"])} units or nearer to the other player or destination to win.")
   print(f"Turn Timeout:     {colored(timeout, attrs=["bold", "underline"])} seconds.")
   print("")
-
-# testing functions
-# update_dicts()
-# print_stats(player_one)
-# print_stats(player_two)
-# update_coords(100, 0, 1)
   
 # ----------------- MAIN CODE -----------------
 print("----------------------------------------------")
-cprint("Hello, welcome to this math game by Sean Chan!", "white", attrs=["bold"])
+cprint("Hello, welcome to this math game by Sean Chan!", "white", attrs=["bold"]) # Prints a welcome message in bold
 print("----------------------------------------------")
 
-# Initalise some default settings
-size_of_grid = 400
-colour = ["red", "blue", "black"]
-pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # Make print_colours list and use it in selecting colours.
-distance_to_win = 10
-npc_mode = False
-npc_difficulty = 3
-player_size = 3
-rounding_type = "down"
-timeout = 10
+# Initalise some default settings, can be modified in settings.
+size_of_grid = 400 # The default size of the grid.
+colour = ["red", "blue", "black"] # The default colours of the players and destination
+pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # The default print colours of the player and destination, from the colour list
+distance_to_win = 10 # The default distance needed (or less) to win.
+npc_mode = False # The default is that npc is turned off.
+npc_difficulty = 3 # The default of the npc is the hardest: 3
+player_size = 3 # The default player size is 3 pixels wide, this is for drawing the players visually in pygame
+rounding_type = "down" # The default rounding to a triple if the distance selected does not exist as a hypothenuse is down.
+timeout = 10 # The timeout of a turn defaults at 10 seconds to move.
 
 # Main loop
-while True:
+while True: # so you can replay
   # quits the display, this is for replaying.
   pygame.display.quit()
 
-  # This is the main (text based) menu of the game
+  # This is the main (text based) menu of the game, where the user(s) can changed settings related to gameplay. Every input is checked for user error or if the user wants to quit. Printed also in colour.
   menu = True
-  while menu:
-    userInput = input("Enter 'start' to start the game. Enter 'help' for additional commands: ").lower().strip() # inputs a command, removing spaces and making it lowercase.
+  while menu: # Repeats until player inputs start.
+    userInput = input("Enter 'start' to start the game. Enter 'help' for additional commands: ").lower().strip() # tells the player to input a command, removing spaces and making it lowercase.
     if userInput == "start": # checks what command it is a does it.
       menu = False
-    elif userInput == "help":
+    elif userInput == "help": # shows what each command does.
       cprint("""
 'help'     -> Displays all commands and what they do.
 'start'    -> Starts a new round of the game.
@@ -282,11 +274,11 @@ RULES:
   -> Direction is a number from 1 to 8, representing the quadrants of the cartesian plane cut in half.
   -> Cartesian direction means that 0 degrees is East and the positive direction is counter-clockwise.
 """)
-    elif userInput == "quit":
+    elif userInput == "quit": # if the user wants to quit
       pygame.quit()
       sys.exit()
-    elif userInput == "settings":
-      while True:
+    elif userInput == "settings": # if the user wants to change settings.
+      while True: # display settings that can be changed, if they are entered, guide the user to change them.
         cprint("""
 Enter a command to edit:
 'npc'         -> Toggles npc or no npc. Default is no npc.
@@ -301,11 +293,11 @@ Enter a command to edit:
 'back'        -> Go back to previous page.
 """, "dark_grey")
         editAnswer = input("Command: ").strip().lower()
-        if editAnswer == "back":
+        if editAnswer == "back": # back to main menu
           break
-        elif editAnswer == "size.grid":
+        elif editAnswer == "size.grid": 
           sizeSelect = True
-          while sizeSelect:
+          while sizeSelect: # handles user input then changes the setting
             sizeAnswer = input("Select the size of the grid. (100 to 800): ").strip()
             try:
               sizeAnswer = int(sizeAnswer)
@@ -324,8 +316,8 @@ Enter a command to edit:
               size_of_grid = round(sizeAnswer / 2)
               cprint(f"Size of grid has been set to {str(sizeAnswer)}.", "green", attrs=["bold"])
               break
-        elif editAnswer == "colour":
-          back = False
+        elif editAnswer == "colour": # handles user input then changes the setting
+          back = False 
           for i in range(3): # change to 4 after implementing npc.
             while True:
               colourSelect = input(f"Select a colour for {"player 1" if i == 0 else ("player 2" if i == 1 else "destination")}: ").strip().lower()
@@ -333,7 +325,7 @@ Enter a command to edit:
                 cprint(f"Colour {colourSelect} selected.", print_colours[colourSelect], attrs=["bold"])
                 colour[i] = colourSelect
                 break
-              elif colourSelect == "list":
+              elif colourSelect == "list": # displays the list of colours
                 print("Here is a list of colours:")
                 for c in print_colours.keys():
                   print(" " + c)
@@ -348,7 +340,7 @@ Enter a command to edit:
             if back:
               break
           pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # refresh the pcolor variable to sync with the colour variable
-        elif editAnswer == "npc":
+        elif editAnswer == "npc": # handles user input then changes the setting
           if npc_mode == False:
             npc_mode = True
             if input(colored("NPC mode has been turned on. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
@@ -357,7 +349,7 @@ Enter a command to edit:
             npc_mode = False
             if input(colored("NPC mode has been turned off. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
-        elif editAnswer == "npc.level":
+        elif editAnswer == "npc.level": # handles user input then changes the setting
           while True:
             levelSelect = input("Enter new difficulty of NPC. (1-3): ").strip()
             if levelSelect == "quit":
@@ -373,7 +365,7 @@ Enter a command to edit:
               break
             else:
               print("Must be a number from 1 to 3.", "red", attrs=["underline"])
-        elif editAnswer == "size.player":
+        elif editAnswer == "size.player": # handles user input then changes the setting
           while True:
             sizePlayerAnswer = input("Select the size of the players and destination. (3 to 20): ").strip()
             try:
@@ -393,7 +385,7 @@ Enter a command to edit:
               player_size = sizePlayerAnswer
               cprint(f"Size of players and destination has been set to {str(sizePlayerAnswer)}.", "green", attrs=["bold"])
               break
-        elif editAnswer == "personal":
+        elif editAnswer == "personal": # handles user input then changes the setting
           while True:
             personalAnswer = input("Select the distance from the destination that you need to get to win. (0 to 100): ").strip()
             try:
@@ -414,7 +406,7 @@ Enter a command to edit:
               distance_to_win = personalAnswer
               cprint(f"The distance needed to win has been set to {personalAnswer}.", "green", attrs=["bold"])
               break
-        elif editAnswer == "rounding":
+        elif editAnswer == "rounding": # handles user input then changes the setting
           if rounding_type == "down":
             rounding_type = "up"
             if input("Rounding has been set to up. Enter to continue: ").lower().strip() == "quit":
@@ -423,11 +415,11 @@ Enter a command to edit:
             rounding_type = "down"
             if input("Rounding has been set to down. Enter to continue: ").lower().strip() == "quit":
               sys.exit()
-        elif editAnswer == "print":
+        elif editAnswer == "print": # prints current settings
           print_settings()
           if input(colored("Enter to continue: ", "green", attrs=["bold"])).strip().lower() == "quit":
             sys.exit()
-        elif editAnswer == "time":
+        elif editAnswer == "time": # handles user input then changes the setting
           while True:
             timeAnswer = input("Select the timeout for moving. (1 to 100 seconds): ").strip()
             try:
@@ -455,7 +447,7 @@ Enter a command to edit:
       cprint("That is invalid. Enter 'help' for commands.", "red", attrs=["underline"])
       print("------------------------------------------------------------------------")
   
-  # After the menu, this is the game code.
+  # After the menu, this is the game code for the actual game. Printed all stats in colour, handles user input and if they want to quit.
   cprint("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)", "white", attrs=["bold"]) # print out some early texts to show players.
   cprint(f"Player 1, you are {colour[0]}.", pcolour[0])
   if npc_mode == True:
@@ -482,23 +474,23 @@ Enter a command to edit:
   gameInProgress = True
   while gameInProgress:
 
-    # Pygame pump
+    # Pygame pump so that it doesn't say not responding
     for event in pygame.event.get():
       if event.type == pygame.QUIT: # must have this else the user can't quit.
         pygame.quit()
         sys.exit()
-      if event.type == pygame.MOUSEBUTTONDOWN:
+      if event.type == pygame.MOUSEBUTTONDOWN: # if the screen is clicked, next turn starts
         move = None
-        if npc_mode == False or turn == 1:
+        if npc_mode == False or turn == 1: # player's turn
           # Get move from player.
           inputting = True
-          while inputting:
+          while inputting: # Handles user error
 
             try:
-              move = input_with_timeout(f"Player {turn}! Make your move: ", timeout)
+              move = input_with_timeout(f"Player {turn}! Make your move: ", timeout) # Timeout for input
               print("")
             except TimeoutExpired:
-              cprint("\nTimes up. Picking random triple.")
+              print("\nTimes up. Picking random triple.")
               move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
               print(f"Selected: {move}")
 
@@ -506,9 +498,9 @@ Enter a command to edit:
               pygame.quit()
               sys.exit()
             
-            move = move.split(" ")
+            move = move.split(" ") # splits the str to have 2 parts, distance and direction
 
-            try:
+            try: # More user error
               distance = int(move[0])
               direction = int(move[1])
             except:
@@ -543,7 +535,7 @@ Enter a command to edit:
         if rounding_type == "up" and distance > 797: # Prevent from going up when its above the highest.
           distance = 797
         
-        isFound = False
+        isFound = False # isfound is set to false.
         for num in range(100): # The 100 here is to ensure a triple is picked.
           for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
             if rounding_type == "down": # If the type of rounding is down
@@ -567,83 +559,83 @@ Enter a command to edit:
         if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
           a = abs(a)
           b = abs(b)
-          update_coords(b, a, turn)
+          translate_coords(b, a, turn) # translates the player coords
         elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
           a = -abs(a)
           b = abs(b)
-          update_coords(a, b, turn)
+          translate_coords(a, b, turn) # translates the player coords
         elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
           a = -abs(a)
           b = -abs(b)
-          update_coords(b, a, turn)
+          translate_coords(b, a, turn) # translates the player coords
         elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
           a = abs(a)
           b = -abs(b)
-          update_coords(a, b, turn)
+          translate_coords(a, b, turn) # translates the player coords
 
         # Update dictionaries and stats
         update_dicts()
         
-        # Check for win and submit to variables and print accordingly.
+        # Refresh screen
+        make_pygame_coords() # update the pygame coords so that the app_surf_update will work.
+        app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+        refresh_window() # call the function to refresh the window
+        
+        # Check for winning conditions and submit to variables that store if the player won
         destinationWin = False
         playerWin = False
         if turn == 1: # prints the stats of the player.
           print_stats(player_one, destination)
           destinationWin = check_destination_win(player_one) # Check if the player won.
-          playerWin = check_player_win(player_one, player_two)
+          playerWin = check_player_win(player_one, player_two) # Check if the player won.
         elif turn == 2:
           print_stats(player_two, destination)
           destinationWin = check_destination_win(player_two) # Check if the player won.
-          playerWin = check_player_win(player_two, player_one)
+          playerWin = check_player_win(player_two, player_one) # Check if the player won.
         
-        # Refresh screen
-        make_pygame_coords()
-        app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
-        refresh_window()
-
-        # Check if the player won
+        # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
         if destinationWin: # Win by getting near destination
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            lastInput = input("Player 1 won because they ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])
+            lastInput = input("Player 1 won because they ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
             else:
-              gameInProgress = False
+              gameInProgress = False # leaves the current game and goes back into the main menu
               break
           elif turn == 2:
             print_stats(player_one)
-            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])
+            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
             else:
-              gameInProgress = False
+              gameInProgress = False # leaves the current game and goes back into the main menu
               break
         elif playerWin: # Win by getting near player
           if turn == 1: # Checks which player won.
             print_stats(player_two)
-            lastInput = input(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])
+            lastInput = input(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
             else:
-              gameInProgress = False
+              gameInProgress = False # leaves the current game and goes back into the main menu
               break
           elif turn == 2:
             print_stats(player_one)
-            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])
+            lastInput = input(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"]) # print who won with colour and winning condition
             if lastInput.lower().strip() == "quit": # Just in case they want to exit.
               pygame.quit()
               sys.exit()
             else:
-              gameInProgress = False
+              gameInProgress = False # leaves the current game and goes back into the main menu
               break
         
         
         # Change the turn 
-        turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2.
+        turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2 so it can loop back again for the next player's turn.
 
         # Print the player whose turn it is and tell them to click
         if npc_mode == False or turn == 1:
@@ -651,6 +643,7 @@ Enter a command to edit:
         else:
           cprint("It's the NPC's turn! Click to continue.", pcolour[turn-1])
 
-    make_pygame_coords()
+    # If no player clicked the screen for that tick, refresh the screen
+    make_pygame_coords() # Update the pygame_coords
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
-    refresh_window()
+    refresh_window() # Refreshes the window.

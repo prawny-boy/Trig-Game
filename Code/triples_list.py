@@ -1,4 +1,4 @@
-# last number is hypothenuse
+# last number is hypothenuse, defines the triple_list.
 triples = [
 [3, 4, 5],
 [5, 12, 13],
