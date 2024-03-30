@@ -51,7 +51,6 @@ More:
   NPC can be added for more marks
 
 Todo:
-  time penalty of 10 sec, pick random instead
   print in colour
   make npc attempt to go to other player?
   write comments on every important line
