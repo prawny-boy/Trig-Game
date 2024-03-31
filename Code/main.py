@@ -464,6 +464,7 @@ Enter a command to edit:
   else:
     cprint(f"Player 2, you are {colour[1]}.", pcolour[1])
   cprint("Click the screen to start the game.", attrs=["bold"]) # tells players to click the screen
+  print("")
 
   # Restart. this is for resetting the dictionaries
   reset_dicts()
@@ -477,6 +478,9 @@ Enter a command to edit:
   # Start turns
   turn = 1
   gameInProgress = True
+  inputting = False
+  user_input = ""
+  
   while gameInProgress:
 
     # Pygame pump so that it doesn't say not responding
@@ -484,173 +488,164 @@ Enter a command to edit:
       if event.type == pygame.QUIT: # must have this else the user can't quit.
         pygame.quit()
         sys.exit()
-      if event.type == pygame.MOUSEBUTTONDOWN: # if the screen is clicked, next turn starts
-        move = None
-        if npc_mode == False or turn == 1: # player's turn
-          # Get move from player.
+      if event.type == pygame.MOUSEBUTTONDOWN or event.type == pygame.KEYDOWN: # If either the screen is clicked or a key is pressed
+        if event.type == pygame.MOUSEBUTTONDOWN: # if the screen is clicked, next turn starts
           inputting = True
-          while inputting: # Handles user error
+          move = None
+          if npc_mode == True and turn == 2: # If its the npc's turn, start its turn, otherwise ignore
+            print("NPC turn:", end=" ")
+            update_dicts()
+            move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
+            for char in move:
+              print(char, end="")
+              sys.stdout.flush()
+              time.sleep(random.random() / 2)
+            print("")
+            move = move.split(" ")
+            distance = int(move[0])
+            direction = int(move[1])
+            inputting = False
 
-            q = queue.Queue()
-            t = threading.Thread(target=input_with_timeout, args=(f"Player {turn}! Make your move: ", timeout, q))
-            t.start()
-            try:
-              move = q.get(timeout=timeout)
-            except queue.Empty:
-              print("\nTimes up. Picking random triple.")
-              move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
-              print(f"Selected: {move}")
+        if event.type == pygame.KEYDOWN: # If a key is pressed
+          if inputting == True: # If its supposed to be inputting
+            if npc_mode == False or turn == 1: # if its the player's turn
+              if event.key == pygame.K_BACKSPACE: # If a backspace is pressed
+                user_input = user_input[:-1] # Remove a letter
+              elif event.key == pygame.K_RETURN: # If its entered
+                move = user_input # Set move to the user input
+                user_input = "" # Set the user input to a empty string
 
-            if "quit" in move.lower(): # just in case player wants to quit.
-              pygame.quit()
-              sys.exit()
-            
-            move = move.split(" ") # splits the str to have 2 parts, distance and direction
+                if "quit" in move.lower(): # just in case player wants to quit.
+                  pygame.quit()
+                  sys.exit()
+                
+                move = move.split(" ") # splits the str to have 2 parts, distance and direction
 
-            try: # More user error
-              distance = int(move[0])
-              direction = int(move[1])
-            except:
-              cprint("Please enter in format 'distance<space>direction' where distance and directions are numbers.", pcolour[turn-1], attrs=["underline"])
-              continue
-            
-            if distance < 0:
-              cprint("The distance was negative. Please re-enter.", pcolour[turn-1], attrs=["underline"])
-            elif distance < 5: # Just in case if it is less then 5
-              cprint("The distance was less than 5. Please re-enter.", pcolour[turn-1], attrs=["underline"])
-            elif direction > 8 or direction < 1:
-              cprint("The direction must be 1-8. Read rules for more details.", pcolour[turn-1], attrs=["underline"])
-            elif distance > size_of_grid * 2 or distance < 0:
-              cprint(f"Distance must be from 0 to {size_of_grid * 2}.", pcolour[turn-1], attrs=["underline"])
-            else:
-              inputting = False
-
-        else: # If it is the NPC's turn
-          print("NPC turn:", end=" ")
-          update_dicts()
-          move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
-          for char in move:
-            print(char, end="")
-            sys.stdout.flush()
-            time.sleep(random.random() / 2)
-          print("")
-          move = move.split(" ")
-          distance = int(move[0])
-          direction = int(move[1])
-
-        # Find triple
-        if rounding_type == "up" and distance > 797: # Prevent from going up when its above the highest.
-          distance = 797
-        
-        isFound = False # isfound is set to false.
-        for num in range(100): # The 100 here is to ensure a triple is picked.
-          for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
-            if rounding_type == "down": # If the type of rounding is down
-              if triple[2] == (distance - num): # This checks for the triple with the distance with subtracting every time it is looped.
-                a = triple[0] # if the triple is matching, save the a and b sides.
-                b = triple[1]
-                isFound = True # allows us to break from the second loop.
-                break
-            else: # If the type of rounding is up
-              if triple[2] == (distance + num): # This checks for the triple with the distance with adding every time it is looped.
-                a = triple[0] # if the triple is matching, save the a and b sides.
-                b = triple[1]
-                isFound = True # allows us to break from the second loop.
-                break
-          if isFound == True: # only occurs if the triple is found
+                try: # More user error
+                  distance = int(move[0])
+                  direction = int(move[1])
+                except:
+                  cprint("Please enter in format 'distance<space>direction' where distance and directions are numbers.\n", pcolour[turn-1], attrs=["underline"])
+                  continue
+                
+                if distance < 0:
+                  cprint("The distance was negative. Please re-enter.\n", pcolour[turn-1], attrs=["underline"])
+                elif distance < 5: # Just in case if it is less then 5
+                  cprint("The distance was less than 5. Please re-enter.\n", pcolour[turn-1], attrs=["underline"])
+                elif direction > 8 or direction < 1:
+                  cprint("The direction must be 1-8. Read rules for more details.\n", pcolour[turn-1], attrs=["underline"])
+                elif distance > size_of_grid * 2 or distance < 0:
+                  cprint(f"Distance must be from 0 to {size_of_grid * 2}.\n", pcolour[turn-1], attrs=["underline"])
+                else:
+                  inputting = False # If not user error, turn inputting off
+              else:
+                user_input += event.unicode # If any other key is pressed, add that key to the user input
+          else: # If its not supposed to be inputting.
             break
 
-        # Use direction to move to a coordinate.
-        if direction % 2 == 0: # if the direction is even, flip a and b.
-          a, b = b, a # flips the variables so a=b and b=a
-        if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
-          a = abs(a)
-          b = abs(b)
-          translate_coords(b, a, turn) # translates the player coords
-        elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
-          a = -abs(a)
-          b = abs(b)
-          translate_coords(a, b, turn) # translates the player coords
-        elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
-          a = -abs(a)
-          b = -abs(b)
-          translate_coords(b, a, turn) # translates the player coords
-        elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
-          a = abs(a)
-          b = -abs(b)
-          translate_coords(a, b, turn) # translates the player coords
+        if inputting == False: # Only occurs if a turn has been just entered/made.
+          # Find triple
+          if rounding_type == "up" and distance > 797: # Prevent from going up when its above the highest.
+            distance = 797
+          
+          isFound = False # isfound is set to false.
+          for num in range(100): # The 100 here is to ensure a triple is picked.
+            for triple in triples: # This loops through the dictionary with triples and finds the one that has the distance with hypothenuse matching.
+              if rounding_type == "down": # If the type of rounding is down
+                if triple[2] == (distance - num): # This checks for the triple with the distance with subtracting every time it is looped.
+                  a = triple[0] # if the triple is matching, save the a and b sides.
+                  b = triple[1]
+                  isFound = True # allows us to break from the second loop.
+                  break
+              else: # If the type of rounding is up
+                if triple[2] == (distance + num): # This checks for the triple with the distance with adding every time it is looped.
+                  a = triple[0] # if the triple is matching, save the a and b sides.
+                  b = triple[1]
+                  isFound = True # allows us to break from the second loop.
+                  break
+            if isFound == True: # only occurs if the triple is found
+              break
 
-        # Update dictionaries and stats
-        update_dicts()
-        
-        # Refresh screen
-        make_pygame_coords() # update the pygame coords so that the app_surf_update will work.
-        app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
-        refresh_window() # call the function to refresh the window
-        
-        # Check for winning conditions and submit to variables that store if the player won
-        destinationWin = False
-        playerWin = False
-        if turn == 1: # prints the stats of the player.
-          print_stats(player_one, destination)
-          destinationWin = check_destination_win(player_one) # Check if the player won.
-          playerWin = check_player_win(player_one, player_two) # Check if the player won.
-        elif turn == 2:
-          print_stats(player_two, destination)
-          destinationWin = check_destination_win(player_two) # Check if the player won.
-          playerWin = check_player_win(player_two, player_one) # Check if the player won.
-        
-        # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
-        if destinationWin: # Win by getting near destination
-          if turn == 1: # Checks which player won.
-            print_stats(player_two)
-            lastInput = input(colored("Player 1 won because they ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
-              pygame.quit()
-              sys.exit()
-            else:
-              gameInProgress = False # leaves the current game and goes back into the main menu
-              break
-          elif turn == 2:
-            print_stats(player_one)
-            lastInput = input(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
-              pygame.quit()
-              sys.exit()
-            else:
-              gameInProgress = False # leaves the current game and goes back into the main menu
-              break
-        elif playerWin: # Win by getting near player
-          if turn == 1: # Checks which player won.
-            print_stats(player_two)
-            lastInput = input(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
-              pygame.quit()
-              sys.exit()
-            else:
-              gameInProgress = False # leaves the current game and goes back into the main menu
-              break
-          elif turn == 2:
-            print_stats(player_one)
-            lastInput = input(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-            if lastInput.lower().strip() == "quit": # Just in case they want to exit.
-              pygame.quit()
-              sys.exit()
-            else:
-              gameInProgress = False # leaves the current game and goes back into the main menu
-              break
-        
-        
-        # Change the turn 
-        turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2 so it can loop back again for the next player's turn.
+          # Use direction to move to a coordinate.
+          if direction % 2 == 0: # if the direction is even, flip a and b.
+            a, b = b, a # flips the variables so a=b and b=a
+          if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
+            a = abs(a)
+            b = abs(b)
+            translate_coords(b, a, turn) # translates the player coords
+          elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
+            a = -abs(a)
+            b = abs(b)
+            translate_coords(a, b, turn) # translates the player coords
+          elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
+            a = -abs(a)
+            b = -abs(b)
+            translate_coords(b, a, turn) # translates the player coords
+          elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
+            a = abs(a)
+            b = -abs(b)
+            translate_coords(a, b, turn) # translates the player coords
 
-        # Print the player whose turn it is and tell them to click
-        if npc_mode == False or turn == 1:
-          cprint(f"Player {turn}, click the screen to move. Close the display to quit.", pcolour[turn-1])
-        else:
-          cprint("It's the NPC's turn! Click to continue.", pcolour[turn-1])
+          # Update dictionaries and stats
+          update_dicts()
+          
+          # Refresh screen
+          make_pygame_coords() # update the pygame coords so that the app_surf_update will work.
+          app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+          refresh_window() # call the function to refresh the window
+          
+          # Check for winning conditions and submit to variables that store if the player won
+          destinationWin = False
+          playerWin = False
+          if turn == 1: # prints the stats of the player.
+            print_stats(player_one, destination)
+            destinationWin = check_destination_win(player_one) # Check if the player won.
+            playerWin = check_player_win(player_one, player_two) # Check if the player won.
+          elif turn == 2:
+            print_stats(player_two, destination)
+            destinationWin = check_destination_win(player_two) # Check if the player won.
+            playerWin = check_player_win(player_two, player_one) # Check if the player won.
+          
+          # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
+          if destinationWin: # Win by getting near destination
+            if turn == 1: # Checks which player won.
+              print_stats(player_two)
+              print(colored("Player 1 won because they ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+              gameInProgress = False # leaves the current game and goes back into the main menu
+              break
+            elif turn == 2:
+              print_stats(player_one)
+              print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+              gameInProgress = False # leaves the current game and goes back into the main menu
+              break
+          elif playerWin: # Win by getting near player
+            if turn == 1: # Checks which player won.
+              print_stats(player_two)
+              print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+              gameInProgress = False # leaves the current game and goes back into the main menu
+              break
+            elif turn == 2:
+              print_stats(player_one)
+              print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+              gameInProgress = False # leaves the current game and goes back into the main menu
+              break
+          
+          
+          # Change the turn 
+          turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2 so it can loop back again for the next player's turn.
+
+          # Print the player whose turn it is and tell them to click
+          if npc_mode == False or turn == 1:
+            cprint(f"Player {turn}, click the screen to move. Close the display to quit.", pcolour[turn-1])
+          else:
+            cprint("It's the NPC's turn! Click to continue.", pcolour[turn-1])
 
     # If no player clicked the screen for that tick, refresh the screen
     make_pygame_coords() # Update the pygame_coords
     app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
     refresh_window() # Refreshes the window.
+    
+    # Simulate input
+    if inputting:
+      print("\033[A                                                                  \033[A")
+      print(colored(f"Player {turn}, make your move: ") + user_input)
