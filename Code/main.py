@@ -203,11 +203,29 @@ def check_if_win() -> bool: # Uses above 2 functions to check if a player/npc wo
   else:
     return False
 
-def translate_coords(x_add:int, y_add:int, player_num:int): # Translates the coordinates in a certain amount of x and certain amount of y.
+def translate_coords(x_add:int, y_add:int, player_num:int, boundary:bool): # Translates the coordinates in a certain amount of x and certain amount of y.
   if player_num == 1:
     player_one["current"] = [player_one["current"][0] + x_add, player_one["current"][1] + y_add]
+    if boundary: # stop from going out of screen
+      if player_one["current"][0] > size_of_grid:
+        player_one["current"][0] = size_of_grid
+      elif player_one["current"][0] < -size_of_grid:
+        player_one["current"][0] = -size_of_grid
+      if player_one["current"][1] > size_of_grid:
+        player_one["current"][1] = size_of_grid
+      elif player_one["current"][1] < -size_of_grid:
+        player_one["current"][1] = -size_of_grid
   elif player_num == 2:
     player_two["current"] = [player_two["current"][0] + x_add, player_two["current"][1] + y_add]
+    if boundary: # stop from going out of screen
+      if player_two["current"][0] > size_of_grid:
+        player_two["current"][0] = size_of_grid
+      elif player_two["current"][0] < -size_of_grid:
+        player_two["current"][0] = -size_of_grid
+      if player_two["current"][1] > size_of_grid:
+        player_two["current"][1] = size_of_grid
+      elif player_two["current"][1] < -size_of_grid:
+        player_two["current"][1] = -size_of_grid
 
 def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_x) -> str: # calculates the move for the npc and returns str in the format distance<space>direction.
   # difficulty code
@@ -274,6 +292,7 @@ npc_difficulty = 3 # The default of the npc is the hardest: 3
 player_size = 3 # The default player size is 3 pixels wide, this is for drawing the players visually in pygame
 rounding_type = "down" # The default rounding to a triple if the distance selected does not exist as a hypothenuse is down.
 timeout = 10 # The timeout of a turn defaults at 10 seconds to move.
+boundary_mode = True
 
 # Main loop
 while True: # so you can replay
@@ -329,6 +348,7 @@ Enter a command to edit:
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
 'personal'    -> Changes the buffer to win if near either player or destination. Default is 10 units.
 'time'        -> Changes the timeout for a player taking too long to move. Default is 10 seconds.
+'boundary     -> Toggles the boundary that doesn't let you out the screen. Default is on. (Not Completed)
 'print'       -> Prints the current settings.
 'back'        -> Go back to previous page.
 """, "dark_grey")
@@ -603,19 +623,19 @@ Enter a command to edit:
       if direction <= 2: # if the direction is in the 1st quadrant, a and b are positive.
         a = abs(a)
         b = abs(b)
-        translate_coords(b, a, turn) # translates the player coords
+        translate_coords(b, a, turn, boundary_mode) # translates the player coords
       elif direction <= 4: # if the direction is in the 2nd quadrant, a is negative and b is positive.
         a = -abs(a)
         b = abs(b)
-        translate_coords(a, b, turn) # translates the player coords
+        translate_coords(a, b, turn, boundary_mode) # translates the player coords
       elif direction <= 6: # if the direction is in the 3rd quadrant, a and b are both negative
         a = -abs(a)
         b = -abs(b)
-        translate_coords(b, a, turn) # translates the player coords
+        translate_coords(b, a, turn, boundary_mode) # translates the player coords
       elif direction <= 8: # if the direction is in the 4th quadrant, a is positive and b is negative.
         a = abs(a)
         b = -abs(b)
-        translate_coords(a, b, turn) # translates the player coords
+        translate_coords(a, b, turn, boundary_mode) # translates the player coords
 
       # Update dictionaries and stats
       update_dicts()
