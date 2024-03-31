@@ -47,14 +47,6 @@ print_colours = { # right is print colours, left is pygame colours that correspo
   "lightgrey": "white"
 }
 
-# Threading functions
-def input_with_timeout(prompt, timeout, q):
-  inp = input(prompt)
-  try:
-    q.put(inp)
-  except:
-    pass
-
 # Pygame fuctions
 pygame.init() # Initialise pygame
 app_clock = pygame.time.Clock() # Defines the clock (for pygame display)
@@ -228,6 +220,13 @@ def print_settings(): # Prints the settings of the game out nicely with colour.
   print(f"Win Buffer:       Get {colored(distance_to_win, attrs=["bold", "underline"])} units or nearer to the other player or destination to win.")
   print(f"Turn Timeout:     {colored(timeout, attrs=["bold", "underline"])} seconds.")
   print("")
+
+def input_with_timeout(prompt, timeout, q): # Makes it be able to input with timeout using queue and threading
+  inp = input(prompt)
+  try:
+    q.put(inp)
+  except:
+    pass
   
 # ----------------- MAIN CODE -----------------
 print("----------------------------------------------")
