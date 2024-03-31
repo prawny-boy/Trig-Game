@@ -52,6 +52,5 @@ More:
 
 Todo:
   timeout input
-  boundary that can be turned off
   run import this
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)

@@ -469,11 +469,11 @@ Enter a command to edit:
         elif editAnswer == "rounding": # handles user input then changes the setting
           if rounding_type == "down":
             rounding_type = "up"
-            if input("Rounding has been set to up. Enter to continue: ").lower().strip() == "quit":
+            if input(colored("Rounding has been set to up. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
           else:
             rounding_type = "down"
-            if input("Rounding has been set to down. Enter to continue: ").lower().strip() == "quit":
+            if input(colored("Rounding has been set to down. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
         elif editAnswer == "print": # prints current settings
           print_settings()
@@ -499,6 +499,15 @@ Enter a command to edit:
               timeout = timeAnswer
               cprint(f"Timeout for making a move has been set to {str(timeAnswer)}.", "green", attrs=["bold"])
               break
+        elif editAnswer == "boundary":
+          if boundary_mode == False:
+            boundary_mode = True
+            if input(colored("The boundary is off. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
+              sys.exit()
+          else:
+            boundary_mode = False
+            if input(colored("The boundary is on. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
+              sys.exit()
         elif editAnswer == "quit":
           sys.exit()
         else: 
