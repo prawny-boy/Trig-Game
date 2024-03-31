@@ -51,5 +51,6 @@ More:
   NPC can be added for more marks
 
 Todo:
+  Make the main loop run on thread so that its easier to play.
   run import this
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)

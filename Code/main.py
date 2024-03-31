@@ -4,7 +4,7 @@ import random, time, sys, pygame # Imports needed libraries.
 # Time for making npc typing feel more realistic and timeout of inputs.
 # Sys for system exit and timed input because it needs to be printed using sys.stdout.write().
 # Pygame for visual depiction of display.
-from timeout_input import * # Imports the function to have timed input from a different file.
+import threading, queue # Imports the modules needed to run two things at the same time, or threading. This is used for timed input and taking turns while the screen updates.
 from termcolor import cprint, colored # Imports the module functions that prints in colour.
 from triples_list import * # Imports the triple_list.
 
@@ -46,6 +46,14 @@ print_colours = { # right is print colours, left is pygame colours that correspo
   "cyan": "cyan",
   "lightgrey": "white"
 }
+
+# Threading functions
+def input_with_timeout(prompt, timeout, q):
+  inp = input(prompt)
+  try:
+    q.put(inp)
+  except:
+    pass
 
 # Pygame fuctions
 pygame.init() # Initialise pygame
