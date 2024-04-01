@@ -534,7 +534,6 @@ Enter a command to edit:
   calculation_needed = False
   user_input = ""
   start_time = None
-  timed_out = False
 
   while gameInProgress:
 
