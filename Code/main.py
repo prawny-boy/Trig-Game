@@ -553,12 +553,12 @@ Enter a command to edit:
           print("NPC turn:", end=" ")
           update_dicts()
           move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
-          for char in move:
-            print(char, end="")
-            sys.stdout.flush()
-            time.sleep(random.random() / 2)
+          for char in move: # This is just o simulate the npc typing
+            print(char, end="") # Prints one letter
+            sys.stdout.flush() # Prints everything in the cache, so that the print actually shows.
+            time.sleep(random.random() / 2) # returns a random float
           print("")
-          move = move.split(" ")
+          move = move.split(" ") # Makes the move into a list with distance and direction
           distance = int(move[0])
           direction = int(move[1])
           inputting = False
