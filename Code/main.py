@@ -3,8 +3,7 @@ import random, time, sys, pygame # Imports needed libraries.
 # Random for selecting random coords and a way to calculate the npc move. 
 # Time for making npc typing feel more realistic and timeout of inputs.
 # Sys for system exit and timed input because it needs to be printed using sys.stdout.write().
-# Pygame for visual depiction of display.
-import threading, queue # Imports the modules needed to run two things at the same time, or threading. This is used for timed input and taking turns while the screen updates.
+# Pygame for visual depiction of display and timeout.
 from termcolor import cprint, colored # Imports the module functions that prints in colour.
 from triples_list import * # Imports the triple_list.
 
@@ -269,13 +268,6 @@ def print_settings(): # Prints the settings of the game out nicely with colour.
   print(f"Win Buffer:       Get {colored(distance_to_win, attrs=["bold", "underline"])} units or nearer to the other player or destination to win.")
   print(f"Turn Timeout:     {colored(timeout, attrs=["bold", "underline"])} seconds.")
   print("")
-
-def input_with_timeout(prompt, timeout, q): # Makes it be able to input with timeout using queue and threading
-  inp = input(prompt)
-  try:
-    q.put(inp)
-  except:
-    pass
   
 # ----------------- MAIN CODE -----------------
 print("----------------------------------------------")
@@ -541,6 +533,8 @@ Enter a command to edit:
   inputting = False
   calculation_needed = False
   user_input = ""
+  start_time = None
+  timed_out = False
 
   while gameInProgress:
 
@@ -553,6 +547,8 @@ Enter a command to edit:
         if calculation_needed == False:
           inputting = True
           move = None
+          if npc_mode == False or turn == 1: # If its a player's turn
+            start_time = (pygame.time.get_ticks())/1000
         # NPC turn code
         if npc_mode == True and turn == 2: # If its the npc's turn, start its turn, otherwise ignore
           print("NPC turn:", end=" ")
@@ -568,7 +564,6 @@ Enter a command to edit:
           direction = int(move[1])
           inputting = False
           calculation_needed = True
-
       if event.type == pygame.KEYDOWN: # If a key is pressed
         if inputting == True: # If its supposed to be inputting
           if npc_mode == False or turn == 1: # if its the player's turn
@@ -670,6 +665,7 @@ Enter a command to edit:
       
       # Make sure that the turn is not done 2 times
       calculation_needed = False
+      start_time = None
 
     # If no player clicked the screen for that tick, refresh the screen
     make_pygame_coords() # Update the pygame_coords
@@ -678,5 +674,16 @@ Enter a command to edit:
     
     # Simulate input
     if inputting:
-      print("\033[A                                                                  \033[A")
-      print(colored(f"Player {turn}, make your move: ") + user_input)
+      print("\033[A                                                                  \033[A") # Clear the last line and put the cursor on that line.
+      print(colored(f"Player {turn}, make your move: ") + user_input) # Print that looks like "input"
+    
+    if start_time != None:
+      if (pygame.time.get_ticks() / 1000) - start_time >= timeout:
+        move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
+        print("Timeout! Picking random triple:", move)
+        time.sleep(1)
+        calculation_needed = True
+        inputting = False
+        move = move.split(" ")
+        distance = int(move[0])
+        direction = int(move[1])

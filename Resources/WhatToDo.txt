@@ -51,6 +51,5 @@ More:
   NPC can be added for more marks
 
 Todo:
-  timeout input
-  run import this
+  run import this (waiting for mr kogodi to answer)
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)
