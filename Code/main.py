@@ -188,16 +188,16 @@ def check_if_win() -> bool: # Uses above 2 functions to check if a player/npc wo
       return True
     elif turn == 2:
       print_stats(player_one)
-      print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+      print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
   elif playerWin: # Win by getting near player
     if turn == 1: # Checks which player won.
       print_stats(player_two)
-      print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+      print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
     elif turn == 2:
       print_stats(player_one)
-      print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1! Enter to go back to menu. ", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+      print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
   else:
     return False
@@ -528,14 +528,14 @@ Enter a command to edit:
   refresh_window()
 
   # Start turns
-  turn = 1
-  gameInProgress = True
-  inputting = False
-  calculation_needed = False
-  user_input = ""
-  start_time = None
+  turn = 1 # a variable to store whose turn it is
+  gameInProgress = True # a variable that stores if the game is running
+  inputting = False # a variable that stores if a real player is entering their move, for pygame input and timeout on input.
+  calculation_needed = False # Stores if a player just moved and their turn movement needs to be calculated
+  user_input = "" # stores the current input from the user, this is for pygame input.
+  start_time = None # Stores when the input started.
 
-  while gameInProgress:
+  while gameInProgress: # While the game is running
 
     # Pygame pump so that it doesn't say not responding
     for event in pygame.event.get():
@@ -564,7 +564,7 @@ Enter a command to edit:
           inputting = False
           calculation_needed = True
       if event.type == pygame.KEYDOWN: # If a key is pressed
-        if inputting == True: # If its supposed to be inputting
+        if inputting == True: # If its supposed to be inputting as a player
           if npc_mode == False or turn == 1: # if its the player's turn
             
             # Player turn code
@@ -578,9 +578,9 @@ Enter a command to edit:
                 sys.exit()
               move = move.split(" ") # splits the str to have 2 parts, distance and direction
               try: # More user error
-                distance = int(move[0])
-                direction = int(move[1])
-              except:
+                distance = int(move[0]) # sets the distance and direction
+                direction = int(move[1]) 
+              except: # user error
                 cprint("Please enter in format 'distance<space>direction' where distance and directions are numbers.\n", pcolour[turn-1], attrs=["underline"])
                 continue
               if distance < 0:
@@ -593,7 +593,7 @@ Enter a command to edit:
                 cprint(f"Distance must be from 0 to {size_of_grid * 2}.\n", pcolour[turn-1], attrs=["underline"])
               else:
                 inputting = False # If not user error, turn inputting off
-                calculation_needed = True
+                calculation_needed = True # means that the player has inputted, waiting for the program to move the player.
             else:
               user_input += event.unicode # If any other key is pressed, add that key to the user input
 
@@ -644,9 +644,9 @@ Enter a command to edit:
       update_dicts()
 
       if turn == 1:
-        print_stats(player_one, destination)
+        print_stats(player_one, destination) # print the stats of player 1 if it is their turn
       elif turn == 2:
-        print_stats(player_two, destination)
+        print_stats(player_two, destination) # Print the stats of player 2 if it is their turn
 
       # Check if that player won, if the did, go back to menu.
       if check_if_win():
@@ -677,12 +677,12 @@ Enter a command to edit:
       print(colored(f"Player {turn}, make your move: ") + user_input) # Print that looks like "input"
     
     if start_time != None:
-      if (pygame.time.get_ticks() / 1000) - start_time >= timeout:
-        move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8))
-        print("Timeout! Picking random triple:", move)
-        time.sleep(1)
-        calculation_needed = True
-        inputting = False
-        move = move.split(" ")
-        distance = int(move[0])
+      if (pygame.time.get_ticks() / 1000) - start_time >= timeout: # if the time since the input started is past the timeout time
+        move = str(random.randint(5, size_of_grid * 2)) + " " + str(random.randint(1, 8)) # pick random triple
+        print("Timeout! Picking random triple:", move) # print that a random triple was selected
+        time.sleep(1) # sleep for 1 sec before doing the turn so that the player can see what happened
+        calculation_needed = True # so that the next time it loops the player moves
+        inputting = False # inputting is set to false so key presses won't do anything
+        move = move.split(" ") # splits move into a list
+        distance = int(move[0]) # sets distance and direction
         direction = int(move[1])
