@@ -267,6 +267,7 @@ def print_settings(): # Prints the settings of the game out nicely with colour.
   print(f"Colours:          Player one is {colored(colour[0], print_colours[colour[0]])}, {"player 2" if npc_mode == False else "NPC"} is {colored(colour[1], print_colours[colour[1]])}, destination is {colored(colour[2], print_colours[colour[2]])}.")
   print(f"Win Buffer:       Get {colored(distance_to_win, attrs=["bold", "underline"])} units or nearer to the other player or destination to win.")
   print(f"Turn Timeout:     {colored(timeout, attrs=["bold", "underline"])} seconds.")
+  print(f"Boundary:         The boundary is {colored("On", "green", attrs=["bold"]) if boundary_mode == True else colored("Off", "red", attrs=["bold"])}.")
   print("")
   
 # ----------------- MAIN CODE -----------------
@@ -287,7 +288,8 @@ timeout = 10 # The timeout of a turn defaults at 10 seconds to move.
 boundary_mode = True
 
 # Main loop
-while True: # so you can replay
+while True: # so you can replay 
+
   # quits the display, this is for replaying.
   pygame.display.quit()
 
@@ -494,11 +496,11 @@ Enter a command to edit:
         elif editAnswer == "boundary":
           if boundary_mode == False:
             boundary_mode = True
-            if input(colored("The boundary is off. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
+            if input(colored("The boundary is on. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
           else:
             boundary_mode = False
-            if input(colored("The boundary is on. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
+            if input(colored("The boundary is off. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
               sys.exit()
         elif editAnswer == "quit":
           sys.exit()
