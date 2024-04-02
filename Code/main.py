@@ -143,19 +143,19 @@ def reset_dicts(): # resets every entities' coordinates to random. and then upda
   # For others, like gradient and distance
   update_dicts()
 
-def print_stats(player_dict:dict, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
+def print_stats(player_dict:dict, colour_printing:dict, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
   print("")
-  cprint(f"PLAYER {player_dict["name"].upper()} STATS:", player_dict["colour"], attrs=["bold"])
-  cprint("Location:", player_dict["colour"], end=" ")
+  cprint(f"PLAYER {player_dict["name"].upper()} STATS:", colour_printing[player_dict["colour"]], attrs=["bold"])
+  cprint("Location:", colour_printing[player_dict["colour"]], end=" ")
   print(f"({player_dict["current"][0]}, {player_dict["current"][1]})")
-  cprint(f"Midpoint with player {"two" if player_dict["name"] == "one" else "one"}:", player_dict["colour"], end=" ")
+  cprint(f"Midpoint with player {"two" if player_dict["name"] == "one" else "one"}:", colour_printing[player_dict["colour"]], end=" ")
   print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
-  cprint("Distance to destination:", player_dict["colour"], end=" ")
+  cprint("Distance to destination:", colour_printing[player_dict["colour"]], end=" ")
   print(f"{player_dict["distance"]} units")
-  cprint("Gradient with destination:", player_dict["colour"], end=" ")
+  cprint("Gradient with destination:", colour_printing[player_dict["colour"]], end=" ")
   print(f"{player_dict["gradient"]}")
   if destination_dict != None:
-    cprint(f"Destination Location:", destination_dict["colour"], end=" ")
+    cprint(f"Destination Location:", colour_printing[destination_dict["colour"]], end=" ")
     print(f"{destination_dict["current"][0]}, {destination_dict["current"][1]}.")
   print("")
 
@@ -183,20 +183,20 @@ def check_if_win() -> bool: # Uses above 2 functions to check if a player/npc wo
   # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
   if destinationWin: # Win by getting near destination
     if turn == 1: # Checks which player won.
-      print_stats(player_two)
+      print_stats(player_two, print_colours)
       print(colored("Player 1 won because they ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
     elif turn == 2:
-      print_stats(player_one)
+      print_stats(player_one, print_colours)
       print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
   elif playerWin: # Win by getting near player
     if turn == 1: # Checks which player won.
-      print_stats(player_two)
+      print_stats(player_two, print_colours)
       print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
     elif turn == 2:
-      print_stats(player_one)
+      print_stats(player_one, print_colours)
       print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
   else:
@@ -646,9 +646,9 @@ Enter a command to edit:
       update_dicts()
 
       if turn == 1:
-        print_stats(player_one, destination) # print the stats of player 1 if it is their turn
+        print_stats(player_one, print_colours, destination) # print the stats of player 1 if it is their turn
       elif turn == 2:
-        print_stats(player_two, destination) # Print the stats of player 2 if it is their turn
+        print_stats(player_two, print_colours, destination) # Print the stats of player 2 if it is their turn
 
       # Check if that player won, if the did, go back to menu.
       if check_if_win():
