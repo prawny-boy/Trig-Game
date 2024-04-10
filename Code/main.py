@@ -311,10 +311,10 @@ print("----------------------------------------------")
 
 # Initalise some default settings, can be modified in settings.
 size_of_grid = 400 # The default size of the grid.
-colour = ["red", "blue", "black"] # The default colours of the players and destination
-pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # The default print colours of the player and destination, from the colour list
+colour = ["red", "blue", "black", "green"] # The default colours of the players, npc and destination
+pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]], print_colours[colour[3]]] # The default print colours of the player and destination, from the colour list
 distance_to_win = 10 # The default distance needed (or less) to win.
-npc_mode = False # The default is that npc is turned off.
+npc_mode = 2 # The default is that npc is turned on as player 3.
 npc_difficulty = 3 # The default of the npc is the hardest: 3
 player_size = 3 # The default player size is 3 pixels wide, this is for drawing the players visually in pygame
 rounding_type = "down" # The default rounding to a triple if the distance selected does not exist as a hypothenuse is down.
@@ -368,7 +368,7 @@ RULES:
       while True: # display settings that can be changed, if they are entered, guide the user to change them.
         cprint("""
 Enter a command to edit:
-'npc'         -> Toggles npc or no npc. Default is no npc.
+'npc'         -> Toggles npc or no npc snd if the npc is player 2 or 3. Default is npc as player 3.
 'npc.level'   -> Selects the difficulty of the npc. Default is 3. (the hardest)
 'rounding'    -> Toggles rounding to triple, up or down. Default is down.
 'size.grid'   -> Changes the size of the grid. This also changes the player coords to be random. The default is 400 pixels.
@@ -429,14 +429,21 @@ Enter a command to edit:
               break
           pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # refresh the pcolor variable to sync with the colour variable
         elif editAnswer == "npc": # handles user input then changes the setting
-          if npc_mode == False:
-            npc_mode = True
-            if input(colored("NPC mode has been turned on. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
+          while True:
+            npcSelect = input("Enter new setting of NPC, "+colored("0 is off", "red")+", "+colored("1 is NPC as player 2", "yellow")+", "+colored("2 is NPC as player 3", "green")+": ").strip()
+            if npcSelect == "quit":
               sys.exit()
-          else:
-            npc_mode = False
-            if input(colored("NPC mode has been turned off. Enter to continue: ", "green", attrs=["bold"])).lower().strip() == "quit":
-              sys.exit()
+            try:
+              npcSelect = int(npcSelect)
+            except:
+              cprint("Must be a number from 1 to 3.", "red", attrs=["underline"])
+              continue
+            if npcSelect >= 1 and npcSelect <= 3:
+              cprint(f"Successfully selected the NPC to be {"on" if npcSelect > 0 else "off"}. {f"The NPC is player 2." if npcSelect == 1 else ("The NPC is player 3." if npcSelect == 2 else "")}", "green", attrs=["bold"])
+              npc_mode = npcSelect
+              break
+            else:
+              print("Must be a number from 1 to 3.", "red", attrs=["underline"])
         elif editAnswer == "npc.level": # handles user input then changes the setting
           while True:
             levelSelect = input("Enter new difficulty of NPC. (1-3): ").strip()
@@ -445,7 +452,7 @@ Enter a command to edit:
             try:
               levelSelect = int(levelSelect)
             except:
-              cprint("Must be a number.", "red", attrs=["underline"])
+              cprint("Must be a number from 1 to 3.", "red", attrs=["underline"])
               continue
             if levelSelect >= 1 and levelSelect <= 3:
               cprint(f"Successfully selected difficulty to be {levelSelect}.", "green", attrs=["bold"])
