@@ -376,7 +376,7 @@ Enter a command to edit:
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
 'personal'    -> Changes the buffer to win if near either player or destination. Default is 10 units.
 'time'        -> Changes the timeout for a player taking too long to move. Default is 10 seconds.
-'boundary     -> Toggles the boundary that doesn't let you out the screen. Default is on. (Not Completed)
+'boundary     -> Toggles the boundary that doesn't let you out the screen. Default is on.
 'print'       -> Prints the current settings.
 'back'        -> Go back to previous page.
 """, "dark_grey")
@@ -554,10 +554,12 @@ Enter a command to edit:
   # After the menu, this is the game code for the actual game. Printed all stats in colour, handles user input and if they want to quit.
   cprint("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)", "white", attrs=["bold"]) # print out some early texts to show players.
   cprint(f"Player 1, you are {colour[0]}.", pcolour[0])
-  if npc_mode == True:
-    cprint(f"The NPC is {colour[1]}.", pcolour[1])
+  if npc_mode == 1:
+    cprint(f"The NPC is {colour[3]}.", pcolour[3])
   else:
     cprint(f"Player 2, you are {colour[1]}.", pcolour[1])
+  if npc_mode == 2:
+    cprint(f"The NPC is {colour[3]}.", pcolour[3])
   cprint("Click the screen to start the game.", attrs=["bold"]) # tells players to click the screen
   print("")
 
@@ -589,13 +591,16 @@ Enter a command to edit:
         if calculation_needed == False:
           inputting = True
           move = None
-          if npc_mode == False or turn == 1: # If its a player's turn
+          if npc_mode == 0 or turn == 1 or (npc_mode == 2 and turn == 2): # If its a player's turn
             start_time = (pygame.time.get_ticks())/1000
         # NPC turn code
-        if npc_mode == True and turn == 2: # If its the npc's turn, start its turn, otherwise ignore
+        if (npc_mode == 0 or turn == 1 or (npc_mode == 2 and turn == 2)) == False: # If its the npc's turn, start its turn, otherwise ignore
           print("NPC turn:", end=" ")
           update_dicts()
-          move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
+          if npc_mode == 1:
+            move = npc_move(player_two["distance"], player_two["gradient"], npc_difficulty, player_two["current"][0], destination["current"][0])
+          else:
+            move = npc_move(npc["distance"], npc["gradient"], npc_difficulty, npc["current"][0], destination["current"][0])
           for char in move: # This is just o simulate the npc typing
             print(char, end="") # Prints one letter
             sys.stdout.flush() # Prints everything in the cache, so that the print actually shows.
@@ -608,7 +613,7 @@ Enter a command to edit:
           calculation_needed = True
       if event.type == pygame.KEYDOWN: # If a key is pressed
         if inputting == True: # If its supposed to be inputting as a player
-          if npc_mode == False or turn == 1: # if its the player's turn
+          if npc_mode == 0 or turn == 1 or (npc_mode == 2 and turn == 2): # if its the player's turn
             
             # Player turn code
             if event.key == pygame.K_BACKSPACE: # If a backspace is pressed
@@ -690,17 +695,24 @@ Enter a command to edit:
         print_stats(player_one, print_colours, destination) # print the stats of player 1 if it is their turn
       elif turn == 2:
         print_stats(player_two, print_colours, destination) # Print the stats of player 2 if it is their turn
+      elif turn == 3:
+        print_stats(npc, print_colours, destination) # Print the stats of the NPC if it is their turn
 
       # Check if that player won, if the did, go back to menu.
       if check_if_win():
         gameInProgress = False # leaves the current game and goes back into the main menu
         break
       
-      # Change the turn 
-      turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2 so it can loop back again for the next player's turn.
+      # Change the turn depending on the npc mode
+      if npc_mode == 2:
+        turn += 1
+        if turn == 4:
+          turn == 1
+      else:
+        turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2 so it can loop back again for the next player's turn.
 
       # Print the player whose turn it is and tell them to click
-      if npc_mode == False or turn == 1:
+      if npc_mode == 0 or turn == 1 or (npc_mode == 2 and turn == 2):
         cprint(f"Player {turn}, click the screen to move. Close the display to quit.", pcolour[turn-1])
       else:
         cprint("It's the NPC's turn! Click to continue.", pcolour[turn-1])
@@ -711,7 +723,10 @@ Enter a command to edit:
 
     # If no player clicked the screen for that tick, refresh the screen
     make_pygame_coords() # Update the pygame_coords
-    app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
+    if npc_mode == 2:
+      app_surf_update(destination, player_one, player_two, npc) # call the function to update the app surface with the new coordinates. Send it the entities
+    else:
+      app_surf_update(destination, player_one, player_two) # call the function to update the app surface with the new coordinates. Send it the entities
     refresh_window() # Refreshes the window.
     
     # Simulate input
