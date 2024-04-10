@@ -37,8 +37,8 @@ npc = { # NPC dictionary
   "colour": None,
   "distance": 0.0,
   "gradient": 0.0,
-  "midpoint_1": [0, 0], # The midpoint from player 1
-  "midpoint_2": [0, 0], # The midpoint from player 2
+  "midpoint": [0, 0], # The midpoint from player 1
+  "midpoint_npc": [0, 0], # The midpoint from player 2
   "personal": 0 
 }
 destination = { # Destination dictionary.
@@ -168,20 +168,50 @@ def reset_dicts(): # resets every entities' coordinates to random. and then upda
   # For others, like gradient and distance
   update_dicts()
 
-def print_stats(player_dict:dict, colour_printing:dict, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
+def print_stats(player_dict:dict, colour_printing:dict, npc:int = 0, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
   print("")
+
   cprint(f"PLAYER {player_dict["name"].upper()} STATS:", colour_printing[player_dict["colour"]], attrs=["bold"])
+
   cprint("Location:", colour_printing[player_dict["colour"]], end=" ")
   print(f"({player_dict["current"][0]}, {player_dict["current"][1]})")
-  cprint(f"Midpoint with player {"two" if player_dict["name"] == "one" else "one"}:", colour_printing[player_dict["colour"]], end=" ")
-  print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
+  
+  if player_dict["name"] == "npc":
+    if npc == 1:
+      cprint(f"Midpoint with player one:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
+    else:
+      cprint(f"Midpoint with player one:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
+      cprint(f"Midpoint with player two:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint_npc"][0]}, {player_dict["midpoint_npc"][1]})")
+  else:
+    if npc == 0:
+      cprint(f"Midpoint with player {"two" if player_dict["name"] == "one" else "one"}:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
+    elif npc == 1:
+      cprint(f"Midpoint with NPC:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
+    else:
+      cprint(f"Midpoint with player {"two" if player_dict["name"] == "one" else "one"}:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
+      cprint(f"Midpoint with NPC:", colour_printing[player_dict["colour"]], end=" ")
+      print(f"({player_dict["midpoint_npc"][0]}, {player_dict["midpoint_npc"][1]})")
+
+  # if npc == 2:
+  #   cprint(f"Midpoint with NPC:", colour_printing[player_dict["colour"]], end=" ")
+  #   print(f"({player_dict["midpoint_npc"][0]}, {player_dict["midpoint_npc"][1]})")
+  
   cprint("Distance to destination:", colour_printing[player_dict["colour"]], end=" ")
   print(f"{player_dict["distance"]} units")
+
   cprint("Gradient with destination:", colour_printing[player_dict["colour"]], end=" ")
   print(f"{player_dict["gradient"]}")
+
   if destination_dict != None:
     cprint(f"Destination Location:", colour_printing[destination_dict["colour"]], end=" ")
     print(f"{destination_dict["current"][0]}, {destination_dict["current"][1]}.")
+  
   print("")
 
 def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
@@ -694,11 +724,11 @@ Enter a command to edit:
       update_dicts()
 
       if turn == 1:
-        print_stats(player_one, print_colours, destination) # print the stats of player 1 if it is their turn
+        print_stats(player_one, print_colours, npc_mode, destination) # print the stats of player 1 if it is their turn
       elif turn == 2:
-        print_stats(player_two, print_colours, destination) # Print the stats of player 2 if it is their turn
+        print_stats(player_two, print_colours, npc_mode, destination) # Print the stats of player 2 if it is their turn
       elif turn == 3:
-        print_stats(npc, print_colours, destination) # Print the stats of the NPC if it is their turn
+        print_stats(npc, print_colours, npc_mode, destination) # Print the stats of the NPC if it is their turn
 
       # Check if that player won, if the did, go back to menu.
       if check_if_win():
