@@ -171,7 +171,7 @@ def reset_dicts(): # resets every entities' coordinates to random. and then upda
   # For others, like gradient and distance
   update_dicts()
 
-def print_stats(player_dict:dict, colour_printing:dict, npc:int = 0, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
+def print_stats(player_dict:dict, colour_printing:dict, npc_mode:int = 0, destination_dict:bool = None): # prints the stats with colour; PLAYER x Location, Distance to destination, Gradient with destination, Midpoint with other player
   print("")
 
   cprint(f"PLAYER {player_dict["name"].upper()} STATS:", colour_printing[player_dict["colour"]], attrs=["bold"])
@@ -180,7 +180,7 @@ def print_stats(player_dict:dict, colour_printing:dict, npc:int = 0, destination
   print(f"({player_dict["current"][0]}, {player_dict["current"][1]})")
   
   if player_dict["name"] == "npc":
-    if npc == 1:
+    if npc_mode == 1:
       cprint(f"Midpoint with player one:", colour_printing[player_dict["colour"]], end=" ")
       print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
     else:
@@ -189,10 +189,10 @@ def print_stats(player_dict:dict, colour_printing:dict, npc:int = 0, destination
       cprint(f"Midpoint with player two:", colour_printing[player_dict["colour"]], end=" ")
       print(f"({player_dict["midpoint_npc"][0]}, {player_dict["midpoint_npc"][1]})")
   else:
-    if npc == 0:
+    if npc_mode == 0:
       cprint(f"Midpoint with player {"two" if player_dict["name"] == "one" else "one"}:", colour_printing[player_dict["colour"]], end=" ")
       print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
-    elif npc == 1:
+    elif npc_mode == 1:
       cprint(f"Midpoint with NPC:", colour_printing[player_dict["colour"]], end=" ")
       print(f"({player_dict["midpoint"][0]}, {player_dict["midpoint"][1]})")
     else:
@@ -223,20 +223,34 @@ def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and ch
   else:
     return False
 
-def check_player_win(player_dict:dict, other_player_dict:dict) -> bool: # Gets a player_dict and checks if that player won through getting into another player's space. returns a boolean.
+def check_player_win(player_dict:dict, other_player_dict:dict, other_other_player_dict:dict = None) -> bool: # Gets a player_dict and checks if that player won through getting into another of the 2 players' spaces. returns a boolean.
   if calculate_distance(player_dict["current"], other_player_dict["current"]) <= player_dict["personal"]:
     return True
+  elif other_other_player_dict != None:
+    if calculate_distance(player_dict["current"], other_other_player_dict["current"]) <= player_dict["personal"]:
+      return True
+    else:
+      return False
   else:
     return False
   
-def check_if_win() -> bool: # Uses above 2 functions to check if a player/npc won.
+def check_if_win(turn:int, npc_mode:int = 0) -> bool: # Uses above 2 functions to check if a player/npc won.
   # Check for winning conditions and submit to variables that store if the player won
   if turn == 1: # prints the stats of the player.
     destinationWin = check_destination_win(player_one) # Check if the player won.
-    playerWin = check_player_win(player_one, player_two) # Check if the player won.
+    if npc_mode == 2:
+      playerWin = check_player_win(player_one, player_two, npc) # Check if the player won.
+    else:
+      playerWin = check_player_win(player_one, player_two) # Check if the player won.
   elif turn == 2:
     destinationWin = check_destination_win(player_two) # Check if the player won.
-    playerWin = check_player_win(player_two, player_one) # Check if the player won.
+    if npc_mode == 2:
+      playerWin = check_player_win(player_two, player_one, npc) # Check if the player won.
+    else:
+      playerWin = check_player_win(player_two, player_one) # Check if the player won.
+  elif turn == 3:
+    destinationWin = check_destination_win(npc) # Check if the player won.
+    playerWin = check_player_win(npc, player_one, player_two) # Check if the player won.
   
   # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
   if destinationWin: # Win by getting near destination
@@ -246,17 +260,21 @@ def check_if_win() -> bool: # Uses above 2 functions to check if a player/npc wo
       return True
     elif turn == 2:
       print_stats(player_one, print_colours)
-      print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+      print(colored(f"{"Player 2" if npc_mode == 0 else "The NPC"} won because {"they" if npc_mode == 0 else "it"} ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
+    elif turn == 3:
+      pass
   elif playerWin: # Win by getting near player
     if turn == 1: # Checks which player won.
       print_stats(player_two, print_colours)
-      print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == False else "the NPC"}!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+      print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == 0 else "the NPC"}!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
     elif turn == 2:
       print_stats(player_one, print_colours)
-      print(colored(f"{"Player 2" if npc_mode == False else "The NPC"} won because {"they" if npc_mode == False else "it"} ended up near player 1!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
+      print(colored(f"{"Player 2" if npc_mode == 0 else "The NPC"} won because {"they" if npc_mode == 0 else "it"} ended up near player 1!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
       return True
+    elif turn == 3:
+      pass
   else:
     return False
 
@@ -328,12 +346,12 @@ def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_
 
 def print_settings(): # Prints the settings of the game out nicely with colour.
   print("")
-  print(f"NPC:              {colored("Off", "red", attrs=["bold"]) if npc_mode == False else colored("On", "green", attrs=["bold"])}, difficulty is {colored(npc_difficulty, "green", attrs=["bold"]) if npc_difficulty == 1 else (colored(npc_difficulty, "yellow", attrs=["bold"]) if npc_difficulty == 2 else colored(npc_difficulty, "red", attrs=["bold"]))}.")
+  print(f"NPC:              {colored("Off", "red", attrs=["bold"]) if npc_mode == 0 else colored("On", "green", attrs=["bold"])}{" as player two" if npc_mode == 1 else (" as player three" if npc_mode == 2 else "")}, difficulty is {colored(npc_difficulty, "green", attrs=["bold"]) if npc_difficulty == 1 else (colored(npc_difficulty, "yellow", attrs=["bold"]) if npc_difficulty == 2 else colored(npc_difficulty, "red", attrs=["bold"]))}.")
   print(f"Rounding:         Currently set to round {colored(rounding_type, "red", attrs=["bold"]) if rounding_type == "down" else colored(rounding_type, "green", attrs=["bold"])}.")
   print(f"Grid Size:        {colored(size_of_grid, attrs=["bold", "underline"])} units.")
   print(f"Player Size:      {colored(player_size, attrs=["bold", "underline"])} pixels wide.")
   print(f"Destination Size: {colored(player_size, attrs=["bold", "underline"])} pixels wide.")
-  print(f"Colours:          Player one is {colored(colour[0], print_colours[colour[0]])}, {"player 2" if npc_mode == False else "NPC"} is {colored(colour[1], print_colours[colour[1]])}, destination is {colored(colour[2], print_colours[colour[2]])}.")
+  print(f"Colours:          Player one is {colored(colour[0], print_colours[colour[0]])}, player 2 is {colored(colour[1], print_colours[colour[1]])}, NPC is {colored(colour[3], print_colours[colour[3]])}, destination is {colored(colour[2], print_colours[colour[2]])}.")
   print(f"Win Buffer:       Get {colored(distance_to_win, attrs=["bold", "underline"])} units or nearer to the other player or destination to win.")
   print(f"Turn Timeout:     {colored(timeout, attrs=["bold", "underline"])} seconds.")
   print(f"Boundary:         The boundary is {colored("On", "green", attrs=["bold"]) if boundary_mode == True else colored("Off", "red", attrs=["bold"])}.")
@@ -734,7 +752,7 @@ Enter a command to edit:
         print_stats(npc, print_colours, npc_mode, destination) # Print the stats of the NPC if it is their turn
 
       # Check if that player won, if the did, go back to menu.
-      if check_if_win():
+      if check_if_win(turn, npc_mode):
         gameInProgress = False # leaves the current game and goes back into the main menu
         break
       
