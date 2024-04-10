@@ -154,8 +154,10 @@ def update_dicts(): # Updates the dictionaries of each entity.
   # Update name of player_two if the npc is player 2
   if npc_mode == 1:
     player_two["name"] = "npc"
+    player_two["colour"] = colour[3]
   else:
     player_two["name"] = "two"
+    player_two["colour"] = colour[1]
 
 def reset_dicts(): # resets every entities' coordinates to random. and then updates the other parts, like distance using the new coordinates
   # reset current coordinates
