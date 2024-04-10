@@ -70,7 +70,7 @@ def create_app_window(width:int, height:int): # Creates app window of the pygame
   app_surf_rect = app_surf.get_rect() # Gets the rectangle of the app surface.
   return app_surf, app_surf_rect # Returns the app surface and rectangle.
 
-def app_surf_update(destination, player_one, player_two, npc: None): # draws plane and players as dot on the visual display with a white background.
+def app_surf_update(destination, player_one, player_two, npc = None): # draws plane and players as dot on the visual display with a white background.
   app_surf.fill("white") # Fill the display surface with white background.
   # draw the x and y axis
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
@@ -137,16 +137,22 @@ def update_dicts(): # Updates the dictionaries of each entity.
   player_two["distance"] = calculate_distance(destination["current"], player_two["current"])
   player_two["gradient"] = calculate_gradient(destination["current"], player_two["current"])
   player_two["midpoint"] = calculate_midpoint(player_two["current"], player_one["current"])
+  # player 3 update
+  npc["distance"] = calculate_distance(destination["current"], npc["current"])
+  npc["gradient"] = calculate_gradient(destination["current"], npc["current"])
+  npc["midpoint"] = calculate_midpoint(npc["current"], player_one["current"])
   # update colours
   player_one["colour"] = colour[0] # sets the colour of each player/destination
   player_two["colour"] = colour[1] # sets the colour of each player/destination
   destination["colour"] = colour[2] # sets the colour of each player/destination
+  npc["colour"] = colour[3] # sets the colour of each player/destination
   # update the personal space buffer
   player_one["personal"] = distance_to_win # sets the distance of the personal space buffer
   player_two["personal"] = distance_to_win # sets the distance of the personal space buffer
   destination["personal"] = distance_to_win # sets the distance of the personal space buffer
-  # Update name of player_two
-  if npc_mode:
+  npc["personal"] = distance_to_win # sets the distance of the personal space buffer
+  # Update name of player_two if the npc is player 2
+  if npc_mode == 1:
     player_two["name"] = "npc"
   else:
     player_two["name"] = "two"
@@ -156,6 +162,7 @@ def reset_dicts(): # resets every entities' coordinates to random. and then upda
   player_one["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
   player_two["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
   destination["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
+  npc["current"] = [random.randint(-size_of_grid, size_of_grid), random.randint(-size_of_grid, size_of_grid)] # resets the random coodinates
   # For others, like gradient and distance
   update_dicts()
 
@@ -241,6 +248,17 @@ def translate_coords(x_add:int, y_add:int, player_num:int, boundary:bool): # Tra
         player_two["current"][1] = size_of_grid
       elif player_two["current"][1] < -size_of_grid:
         player_two["current"][1] = -size_of_grid
+  elif player_num == 3:
+    npc["current"] = [npc["current"][0] + x_add, npc["current"][1] + y_add]
+    if boundary: # stop from going out of screen
+      if npc["current"][0] > size_of_grid:
+        npc["current"][0] = size_of_grid
+      elif npc["current"][0] < -size_of_grid:
+        npc["current"][0] = -size_of_grid
+      if npc["current"][1] > size_of_grid:
+        npc["current"][1] = size_of_grid
+      elif npc["current"][1] < -size_of_grid:
+        npc["current"][1] = -size_of_grid
 
 def npc_move(distance:float, gradient:float, difficulty:int, npc_x, destination_x) -> str: # calculates the move for the npc and returns str in the format distance<space>direction.
   # difficulty code
