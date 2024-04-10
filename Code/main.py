@@ -225,14 +225,14 @@ def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and ch
 
 def check_player_win(player_dict:dict, other_player_dict:dict, other_other_player_dict:dict = None) -> bool: # Gets a player_dict and checks if that player won through getting into another of the 2 players' spaces. returns a boolean.
   if calculate_distance(player_dict["current"], other_player_dict["current"]) <= player_dict["personal"]:
-    return True
+    return other_player_dict["name"]
   elif other_other_player_dict != None:
     if calculate_distance(player_dict["current"], other_other_player_dict["current"]) <= player_dict["personal"]:
-      return True
+      return other_other_player_dict["name"]
     else:
-      return False
+      return ""
   else:
-    return False
+    return ""
   
 def check_if_win(turn:int, npc_mode:int = 0) -> bool: # Uses above 2 functions to check if a player/npc won.
   # Check for winning conditions and submit to variables that store if the player won
@@ -253,28 +253,50 @@ def check_if_win(turn:int, npc_mode:int = 0) -> bool: # Uses above 2 functions t
     playerWin = check_player_win(npc, player_one, player_two) # Check if the player won.
   
   # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
+  if destinationWin or playerWin != "":
+    if npc_mode == 0:
+      winner = "Player " + str(turn)
+      pronoun = "they"
+      colour = pcolour[turn-1]
+      if turn == 1:
+        print_stats(player_two, print_colours, npc_mode)
+      else:
+        print_stats(player_one, print_colours, npc_mode)
+    elif npc_mode == 1:
+      if turn == 2:
+        winner = "The NPC"
+        pronoun = "it"
+        colour = pcolour[3]
+        print_stats(player_one, print_colours, npc_mode)
+      else:
+        winner = "Player 1"
+        pronoun = "they"
+        colour = pcolour[0]
+        print_stats(player_two, print_colours, npc_mode)
+    else:
+      if turn == 3:
+        winner = "The NPC"
+        pronoun = "it"
+        colour = pcolour[3]
+        print_stats(player_one, print_colours, npc_mode)
+        print_stats(player_two, print_colours, npc_mode)
+      else:
+        winner = "Player " + str(turn)
+        pronoun = "they"
+        colour = pcolour[turn-1]
+        if turn == 1:
+          print_stats(player_two, print_colours, npc_mode)
+          print_stats(npc, print_colours, npc_mode)
+        else:
+          print_stats(player_one, print_colours, npc_mode)
+          print_stats(npc, print_colours, npc_mode)
+  
   if destinationWin: # Win by getting near destination
-    if turn == 1: # Checks which player won.
-      print_stats(player_two, print_colours)
-      print(colored("Player 1 won because they ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-      return True
-    elif turn == 2:
-      print_stats(player_one, print_colours)
-      print(colored(f"{"Player 2" if npc_mode == 0 else "The NPC"} won because {"they" if npc_mode == 0 else "it"} ended up near the destination!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-      return True
-    elif turn == 3:
-      pass
-  elif playerWin: # Win by getting near player
-    if turn == 1: # Checks which player won.
-      print_stats(player_two, print_colours)
-      print(colored(f"Player 1 won because they ended up near {"player 2" if npc_mode == 0 else "the NPC"}!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-      return True
-    elif turn == 2:
-      print_stats(player_one, print_colours)
-      print(colored(f"{"Player 2" if npc_mode == 0 else "The NPC"} won because {"they" if npc_mode == 0 else "it"} ended up near player 1!", pcolour[turn-1], attrs=["bold"])) # print who won with colour and winning condition
-      return True
-    elif turn == 3:
-      pass
+    print(colored(f"{winner} won because {pronoun} ended up near the destination!", colour, attrs=["bold"])) # print who won with colour and winning condition
+    return True
+  elif playerWin != "": # Win by getting near player
+    print(colored(f"{winner} won because {pronoun} ended up near {playerWin}!", colour, attrs=["bold"])) # print who won with colour and winning condition
+    return True
   else:
     return False
 
@@ -760,7 +782,7 @@ Enter a command to edit:
       if npc_mode == 2:
         turn += 1
         if turn == 4:
-          turn == 1
+          turn = 1
       else:
         turn = 2 if turn == 1 else 1 # This changes the turns between 1 and 2 so it can loop back again for the next player's turn.
 
@@ -768,7 +790,7 @@ Enter a command to edit:
       if npc_mode == 0 or turn == 1 or (npc_mode == 2 and turn == 2):
         cprint(f"Player {turn}, click the screen to move. Close the display to quit.", pcolour[turn-1])
       else:
-        cprint("It's the NPC's turn! Click to continue.", pcolour[turn-1])
+        cprint("It's the NPC's turn! Click to continue.", pcolour[3])
       
       # Make sure that the turn is not done 2 times
       calculation_needed = False
