@@ -133,14 +133,17 @@ def update_dicts(): # Updates the dictionaries of each entity.
   player_one["distance"] = calculate_distance(destination["current"], player_one["current"])
   player_one["gradient"] = calculate_gradient(destination["current"], player_one["current"])
   player_one["midpoint"] = calculate_midpoint(player_one["current"], player_two["current"])
+  player_one["midpoint_npc"] = calculate_midpoint(player_one["current"], npc["current"])
   # player 2 update
   player_two["distance"] = calculate_distance(destination["current"], player_two["current"])
   player_two["gradient"] = calculate_gradient(destination["current"], player_two["current"])
   player_two["midpoint"] = calculate_midpoint(player_two["current"], player_one["current"])
+  player_two["midpoint_npc"] = calculate_midpoint(player_two["current"], npc["current"])
   # player 3 update
   npc["distance"] = calculate_distance(destination["current"], npc["current"])
   npc["gradient"] = calculate_gradient(destination["current"], npc["current"])
   npc["midpoint"] = calculate_midpoint(npc["current"], player_one["current"])
+  npc["midpoint_npc"] = calculate_midpoint(npc["current"], player_two["current"])
   # update colours
   player_one["colour"] = colour[0] # sets the colour of each player/destination
   player_two["colour"] = colour[1] # sets the colour of each player/destination
