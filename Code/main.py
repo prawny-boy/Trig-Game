@@ -406,9 +406,9 @@ Enter a command to edit:
               break
         elif editAnswer == "colour": # handles user input then changes the setting
           back = False 
-          for i in range(3): # change to 4 after implementing npc.
+          for i in range(4):
             while True:
-              colourSelect = input(f"Select a colour for {"player 1" if i == 0 else ("player 2" if i == 1 else "destination")}: ").strip().lower()
+              colourSelect = input(f"Select a colour for {"player 1" if i == 0 else ("player 2" if i == 1 else ("destination" if i == 2 else "NPC"))}: ").strip().lower()
               if colourSelect in print_colours.keys(): # Checks if it is a real colour.
                 cprint(f"Colour {colourSelect} selected.", print_colours[colourSelect], attrs=["bold"])
                 colour[i] = colourSelect
