@@ -51,5 +51,6 @@ More:
   NPC can be added for more marks
 
 Todo:
-  run import this (waiting for mr kogodi to answer)
+  npc go to player?
+  make npc player 3
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)

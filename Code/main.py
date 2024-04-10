@@ -16,6 +16,7 @@ player_one = { # Player_one dictionary (initialise, so all is set to 0 or none)
   "distance": 0.0, # Distance from destination
   "gradient": 0.0, # The gradient of the player from the destination
   "midpoint": [0, 0], # The midpoint between this player and the other player
+  "midpoint_npc": [0, 0], # The midpoint between this player and the npc, if it is player 3
   "personal": 0 # 0 for now, personal space buffer distance
 }
 player_two = { # Player 2 dictionary. This dictionary can act as the npc when in npc mode.
@@ -26,6 +27,18 @@ player_two = { # Player 2 dictionary. This dictionary can act as the npc when in
   "distance": 0.0,
   "gradient": 0.0,
   "midpoint": [0, 0],
+  "midpoint_npc": [0, 0], # The midpoint between this player and the npc, if it is player 3
+  "personal": 0 
+}
+npc = { # NPC dictionary
+  "name": "npc", 
+  "current": [0, 0], 
+  "pygame_current": None, 
+  "colour": None,
+  "distance": 0.0,
+  "gradient": 0.0,
+  "midpoint_1": [0, 0], # The midpoint from player 1
+  "midpoint_2": [0, 0], # The midpoint from player 2
   "personal": 0 
 }
 destination = { # Destination dictionary.
@@ -67,6 +80,8 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
   # draw player one and player two as circles
   pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
   pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
+  if npc_mode == 2: # npc mode as 3rd player
+    pygame.draw.circle(app_surf, npc['colour'], npc['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
 
 def refresh_window(): # This refreshes the display every 30 ticks
   pygame.display.update()
@@ -80,6 +95,8 @@ def conv_cartesian_to_pygame_coords(x, y): # Converts normal coords to pygame co
 def make_pygame_coords(): # Updates the pygame coords for each entity using their current coordinates.
   player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
   player_two['pygame_current'] = conv_cartesian_to_pygame_coords(player_two['current'][0], player_two['current'][1])
+  if npc_mode == 2:
+    npc['pygame_current'] = conv_cartesian_to_pygame_coords(npc['current'][0], npc['current'][1])
   destination['pygame_current'] = conv_cartesian_to_pygame_coords(destination['current'][0], destination['current'][1])
 
 # define functions to calculate distance, midpoint, gradient, space buffer and printing
