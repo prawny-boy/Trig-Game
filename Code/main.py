@@ -70,7 +70,7 @@ def create_app_window(width:int, height:int): # Creates app window of the pygame
   app_surf_rect = app_surf.get_rect() # Gets the rectangle of the app surface.
   return app_surf, app_surf_rect # Returns the app surface and rectangle.
 
-def app_surf_update(destination, player_one, player_two): # draws plane and players as dot on the visual display with a white background.
+def app_surf_update(destination, player_one, player_two, npc: None): # draws plane and players as dot on the visual display with a white background.
   app_surf.fill("white") # Fill the display surface with white background.
   # draw the x and y axis
   pygame.draw.line(app_surf, 'grey', (0, app_surf_rect.height / 2),(app_surf_rect.width, app_surf_rect.height / 2), width = 1)
@@ -80,7 +80,7 @@ def app_surf_update(destination, player_one, player_two): # draws plane and play
   # draw player one and player two as circles
   pygame.draw.circle(app_surf, player_one['colour'], player_one['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
   pygame.draw.circle(app_surf, player_two['colour'], player_two['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
-  if npc_mode == 2: # npc mode as 3rd player
+  if npc != None: # npc mode as 3rd player
     pygame.draw.circle(app_surf, npc['colour'], npc['pygame_current'], radius = player_size, width = round(player_size * (2 / 3)))
 
 def refresh_window(): # This refreshes the display every 30 ticks
@@ -95,8 +95,7 @@ def conv_cartesian_to_pygame_coords(x, y): # Converts normal coords to pygame co
 def make_pygame_coords(): # Updates the pygame coords for each entity using their current coordinates.
   player_one['pygame_current'] = conv_cartesian_to_pygame_coords(player_one['current'][0], player_one['current'][1])
   player_two['pygame_current'] = conv_cartesian_to_pygame_coords(player_two['current'][0], player_two['current'][1])
-  if npc_mode == 2:
-    npc['pygame_current'] = conv_cartesian_to_pygame_coords(npc['current'][0], npc['current'][1])
+  npc['pygame_current'] = conv_cartesian_to_pygame_coords(npc['current'][0], npc['current'][1]) # doesnt matter if npc as player 3 is off.
   destination['pygame_current'] = conv_cartesian_to_pygame_coords(destination['current'][0], destination['current'][1])
 
 # define functions to calculate distance, midpoint, gradient, space buffer and printing
