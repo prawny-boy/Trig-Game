@@ -64,7 +64,7 @@ pygame.init() # Initialise pygame
 app_clock = pygame.time.Clock() # Defines the clock (for pygame display)
 
 def create_app_window(width:int, height:int): # Creates app window of the pygame display. Takes two integers and returns the application surface and rectangle.
-  pygame.display.set_caption("Game") # Sets the caption of the game
+  pygame.display.set_caption("Gradient Gam! By Sean Chan.") # Sets the caption of the game
   app_dimensions = (width + 10, height + 10) # Sets the dimensions
   app_surf = pygame.display.set_mode(app_dimensions) # Sets the app surface size to the dimensions
   app_surf_rect = app_surf.get_rect() # Gets the rectangle of the app surface.
@@ -218,21 +218,21 @@ def print_stats(player_dict:dict, colour_printing:dict, npc_mode:int = 0, destin
   print("")
 
 def check_destination_win(player_dict:dict) -> bool: # Gets a player_dict and checks if that player won by reaching the destination. returns a boolean.
-  if player_dict["distance"] <= player_dict["personal"]:
-    return True
+  if player_dict["distance"] <= player_dict["personal"]: # if the distance of the player to destination is less than the personal space buffer of the player.
+    return True # Returns that the player won
   else:
-    return False
+    return False # Returns that the player lost
 
 def check_player_win(player_dict:dict, other_player_dict:dict, other_other_player_dict:dict = None) -> bool: # Gets a player_dict and checks if that player won through getting into another of the 2 players' spaces. returns a boolean.
-  if calculate_distance(player_dict["current"], other_player_dict["current"]) <= player_dict["personal"]:
-    return other_player_dict["name"]
+  if calculate_distance(player_dict["current"], other_player_dict["current"]) <= player_dict["personal"]: # if the player and other player's distance is less than 10
+    return other_player_dict["name"] # Returns that the player won through the name of the player
   elif other_other_player_dict != None:
-    if calculate_distance(player_dict["current"], other_other_player_dict["current"]) <= player_dict["personal"]:
-      return other_other_player_dict["name"]
+    if calculate_distance(player_dict["current"], other_other_player_dict["current"]) <= player_dict["personal"]: # if the player and other other player's distance is less than 10
+      return other_other_player_dict["name"] # Returns that the player won through the name of the player
     else:
-      return ""
+      return "" # Returns that the player lost
   else:
-    return ""
+    return "" # Returns that the player lost
   
 def check_if_win(turn:int, npc_mode:int = 0) -> bool: # Uses above 2 functions to check if a player/npc won.
   # Check for winning conditions and submit to variables that store if the player won
@@ -253,13 +253,13 @@ def check_if_win(turn:int, npc_mode:int = 0) -> bool: # Uses above 2 functions t
     playerWin = check_player_win(npc, player_one, player_two) # Check if the player won.
   
   # check the variables, if the player won, print that they did and then go back to menu for replay or quitting.
-  if destinationWin or playerWin != "":
-    if npc_mode == 0:
-      winner = "Player " + str(turn)
+  if destinationWin or playerWin != "": # If the player won in any way
+    if npc_mode == 0: # If the npc is off
+      winner = "Player " + str(turn) # Set printing strings
       pronoun = "they"
       colour = pcolour[turn-1]
       if turn == 1:
-        print_stats(player_two, print_colours, npc_mode)
+        print_stats(player_two, print_colours, npc_mode) #Prints stats of the other players
       else:
         print_stats(player_one, print_colours, npc_mode)
     elif npc_mode == 1:
@@ -293,12 +293,12 @@ def check_if_win(turn:int, npc_mode:int = 0) -> bool: # Uses above 2 functions t
   
   if destinationWin: # Win by getting near destination
     print(colored(f"{winner} won because {pronoun} ended up near the destination!", colour, attrs=["bold"])) # print who won with colour and winning condition
-    return True
+    return True # Return that the player won
   elif playerWin != "": # Win by getting near player
     print(colored(f"{winner} won because {pronoun} ended up near {playerWin}!", colour, attrs=["bold"])) # print who won with colour and winning condition
-    return True
-  else:
-    return False
+    return True # Return that the player won
+  else: # If the player didnt win
+    return False # Return that the player lost
 
 def translate_coords(x_add:int, y_add:int, player_num:int, boundary:bool): # Translates the coordinates in a certain amount of x and certain amount of y.
   if player_num == 1:
@@ -451,7 +451,7 @@ Enter a command to edit:
 'colour'      -> Changes the colours of each player and destination on the display. Default is red, blue and black.
 'personal'    -> Changes the buffer to win if near either player or destination. Default is 10 units.
 'time'        -> Changes the timeout for a player taking too long to move. Default is 10 seconds.
-'boundary     -> Toggles the boundary that doesn't let you out the screen. Default is on.
+'boundary'    -> Toggles the boundary that doesn't let you out the screen. Default is on.
 'print'       -> Prints the current settings.
 'back'        -> Go back to previous page.
 """, "dark_grey")
@@ -628,7 +628,7 @@ Enter a command to edit:
   
   # After the menu, this is the game code for the actual game. Printed all stats in colour, handles user input and if they want to quit.
   cprint("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)", "white", attrs=["bold"]) # print out some early texts to show players.
-  cprint(f"Player 1, you are {colour[0]}.", pcolour[0])
+  cprint(f"Player 1, you are {colour[0]}.", pcolour[0]) # This code tells the players what colours they are
   if npc_mode == 1:
     cprint(f"The NPC is {colour[3]}.", pcolour[3])
   else:
