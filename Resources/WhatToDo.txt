@@ -52,6 +52,5 @@ More:
 
 Todo:
   npc go to player?
-  make npc player 3
   when starting the game have the printing of the stats.
   make powerpoint (USE VS CODE TO PRESENT CODE AND GAMEPLAY)
