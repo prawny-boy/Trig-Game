@@ -502,7 +502,7 @@ Enter a command to edit:
                 cprint("That is not a valid colour. Enter 'list' for a list of avaliable colours.", "red", attrs=["underline"])
             if back:
               break
-          pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]]] # refresh the pcolor variable to sync with the colour variable
+          pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]], print_colours[colour[3]]] # refresh the pcolor variable to sync with the colour variable
         elif editAnswer == "npc": # handles user input then changes the setting
           while True:
             npcSelect = input("Enter new setting of NPC, "+colored("0 is off", "red")+", "+colored("1 is NPC as player 2", "yellow")+", "+colored("2 is NPC as player 3", "green")+": ").strip()
