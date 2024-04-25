@@ -201,10 +201,6 @@ def print_stats(player_dict:dict, colour_printing:dict, npc_mode:int = 0, destin
       cprint(f"Midpoint with NPC:", colour_printing[player_dict["colour"]], end=" ")
       print(f"({player_dict["midpoint_npc"][0]}, {player_dict["midpoint_npc"][1]})")
 
-  # if npc == 2:
-  #   cprint(f"Midpoint with NPC:", colour_printing[player_dict["colour"]], end=" ")
-  #   print(f"({player_dict["midpoint_npc"][0]}, {player_dict["midpoint_npc"][1]})")
-  
   cprint("Distance to destination:", colour_printing[player_dict["colour"]], end=" ")
   print(f"{player_dict["distance"]} units")
 
@@ -385,7 +381,7 @@ cprint("Hello, welcome to this math game by Sean Chan!", "white", attrs=["bold"]
 print("----------------------------------------------")
 
 # Initalise some default settings, can be modified in settings.
-size_of_grid = 400 # The default size of the grid.
+size_of_grid = 300 # The default size of the grid.
 colour = ["red", "blue", "black", "green"] # The default colours of the players, npc and destination
 pcolour = [print_colours[colour[0]], print_colours[colour[1]], print_colours[colour[2]], print_colours[colour[3]]] # The default print colours of the player and destination, from the colour list
 distance_to_win = 10 # The default distance needed (or less) to win.
@@ -628,6 +624,8 @@ Enter a command to edit:
   
   # After the menu, this is the game code for the actual game. Printed all stats in colour, handles user input and if they want to quit.
   cprint("If you haven't read the rules, it is recommended as you won't know how to play. (hint: type 'rules' in menu)", "white", attrs=["bold"]) # print out some early texts to show players.
+  cprint("To make your move, you must click the screen and enter your move STRAIGHT into Pygame.", attrs=["bold"])
+  cprint("I recommend having your terminal on one side of the screen and then the pygame screen on the other so that you can see what you are inputting.")
   cprint(f"Player 1, you are {colour[0]}.", pcolour[0]) # This code tells the players what colours they are
   if npc_mode == 1:
     cprint(f"The NPC is {colour[3]}.", pcolour[3])
